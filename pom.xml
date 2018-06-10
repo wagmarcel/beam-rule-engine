@@ -60,6 +60,61 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+
+    <repository>
+      <id>maven1-repo</id>
+      <name>maven1-repo</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+
+
+    <repository>
+      <id>spring-release</id>
+      <name>spring-release</name>
+      <url>http://repo.spring.io/libs-release</url>
+    </repository>
+
+    <repository>
+      <id>sonatype-nexus-releases</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+
+    <repository>
+      <id>gearpump-shaded-repo</id>
+      <name>Vincent at Bintray</name>
+      <url>http://dl.bintray.com/fvunicorn/maven</url>
+    </repository>
+
+    <repository>
+      <id>Maven-Central</id>
+      <name>Maven Central Repository</name>
+      <url>http://central.maven.org/maven2/</url>
+    </repository>
+
+    <repository>
+      <id>akka-data-replication</id>
+      <name>Patrik at Bintray</name>
+      <url>http://dl.bintray.com/patriknw/maven</url>
+    </repository>
+
+    <repository>
+      <id>cloudera</id>
+      <name>Cloudera repo</name>
+      <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
+    </repository>
+
+    <repository>
+      <id>vincent</id>
+      <name>vincent</name>
+      <url>http://dl.bintray.com/fvunicorn/maven</url>
+    </repository>
+
+    <repository>
+      <id>non</id>
+      <name>non</name>
+      <url>http://dl.bintray.com/non/maven</url>
+    </repository>
   </repositories>
 
   <build>
@@ -185,7 +240,7 @@
         <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
-          <version>4.3.6</version>
+          <version>4.4</version>
           <scope>runtime</scope>
           <exclusions>
             <exclusion>
@@ -338,6 +393,12 @@
           <artifactId>guava-jdk5</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>3.2.16.RELEASE</version>
     </dependency>
 
     <dependency>

@@ -7,6 +7,9 @@ public class Config {
     public static String KAFKA_RULE_UPDATE_TOPIC_PROPERTY = "Kafka_Rule_Update_Topic_Property";
     public static String KAFKA_BOOTSTRAP_SERVERS_PROPERTY = "Kafka_Bootstrap_Servers";
     public static String KAFKA_ZOOKEEPER_SERVERS_PROPERTY = "Kafka_ZooKeeper_Servers";
+    public static String DASHBOARD_TOKEN_PROPERTY = "DASHBOARD_TOKEN";
+    public static String DASHBOARD_URL_PROPERTY = "DASHBOARD_URL";
+    public static String DASHBOARD_STRICT_SSL_VERIFICATION = "DASHBOARD_STRICT_SSL";
 
     private HashMap<String, Object> conf;
     Config(){
