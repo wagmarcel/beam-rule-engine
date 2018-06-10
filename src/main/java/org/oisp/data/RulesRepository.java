@@ -15,15 +15,21 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.data;
 
-import org.oisp.conf.Config;
+import org.oisp.collection.Rule;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
-    }
+public interface RulesRepository {
+
+    Map<String, List<Rule>> getComponentsRules(String accountId, Set<String> componentsIds) throws IOException;
+
+    void createTable() throws IOException;
+
+    void putRulesAndRemoveNotExistingOnes(Map<String, List<Rule>> componentsRules) throws IOException;
 }

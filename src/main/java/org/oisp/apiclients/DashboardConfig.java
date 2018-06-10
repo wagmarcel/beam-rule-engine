@@ -15,15 +15,19 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.apiclients;
 
-import org.oisp.conf.Config;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+public interface DashboardConfig {
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+    String DASHBOARD_TOKEN_PROPERTY = "DASHBOARD_TOKEN";
+    String DASHBOARD_URL_PROPERTY = "DASHBOARD_URL";
+    String DASHBOARD_STRICT_SSL_VERIFICATION = "DASHBOARD_STRICT_SSL";
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
-    }
+    String getUrl();
+
+    String getToken();
+
+    boolean isStrictSSL();
+
 }

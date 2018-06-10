@@ -15,15 +15,11 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.rules.conditions;
 
-import org.oisp.conf.Config;
+import org.oisp.collection.Observation;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+public interface ConditionChecker {
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
-
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
-    }
+    boolean isConditionFulfilled(Observation observation);
 }

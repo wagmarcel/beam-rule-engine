@@ -17,49 +17,44 @@
 
 package org.oisp.transformation;
 
-import kafka.api.OffsetRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
-import org.apache.beam.sdk.io.kafka.KafkaIO.Read;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.oisp.conf.Config;
 import org.oisp.conf.ConfigFactory;
-import java.util.List;
 
 
 public class KafkaSourceProcessor {
 
-    public static final String KAFKA_URI_PROPERTY = Config.KAFKA_BOOTSTRAP_SERVERS_PROPERTY;
-    public static final String KAFKA_ZOOKEEPER_PROPERTY = Config.KAFKA_ZOOKEEPER_SERVERS_PROPERTY;
+    public static final String KAFKA_URI_PROPERTY = Config.KAFKA_URI_PROPERTY;
+    public static final String KAFKA_ZOOKEEPER_PROPERTY = Config.KAFKA_ZOOKEEPER_PROPERTY;
 
-    private static String name;
 
     private KafkaIO.Read<String, byte[]> transform = null;
 
-    public KafkaIO.Read<String,byte[]> getTransform(){
+    public KafkaIO.Read<String, byte[]> getTransform() {
         return transform;
-    };
+    }
 
     public KafkaSourceProcessor(Config userConfig, String topic) {
 
 
-        String[] zookeeperQuorum = userConfig.getStringArray(KAFKA_ZOOKEEPER_PROPERTY);
-        String[] serverUri = userConfig.getStringArray(KAFKA_URI_PROPERTY);
+        String zookeeperQuorum = userConfig.get(KAFKA_ZOOKEEPER_PROPERTY).toString();
+        String serverUri = userConfig.get(KAFKA_URI_PROPERTY).toString();
 
         Config consumerProperties = new ConfigFactory().getConfig();
         consumerProperties.put("zookeeper.connect", zookeeperQuorum);
-        consumerProperties.put("group.id", "gearpump");
-        //consumerProperties.put("offsets.storage", "kafka");
+        consumerProperties.put("group.id", "beam");
+        consumerProperties.put("enable.auto.commit", "true");
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
         transform = KafkaIO.<String, byte[]>read()
-                .withBootstrapServers(serverUri[0])
+                .withBootstrapServers(serverUri)
                 .withTopic(topic)
                 .withKeyDeserializer(StringDeserializer.class)
                 .withValueDeserializer(ByteArrayDeserializer.class)
                 .updateConsumerProperties(consumerProperties.getHash())
-                //.withLogAppendTime()
                 .withReadCommitted()
                 .commitOffsetsInFinalize();
 

@@ -27,7 +27,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <beam.version>2.4.0</beam.version>
+    <beam.version>2.12.0</beam.version>
 
     <bigquery.version>v2-rev374-1.22.0</bigquery.version>
     <google-clients.version>1.22.0</google-clients.version>
@@ -44,7 +44,9 @@
     <pubsub.version>v1-rev10-1.22.0</pubsub.version>
     <slf4j.version>1.7.25</slf4j.version>
     <spark.version>2.2.1</spark.version>
-    <hadoop.version>2.7.3</hadoop.version>
+    <hadoop.version>2.8.2</hadoop.version>
+    <protobuf.version>2.5.0</protobuf.version>
+      <kafka.version>1.0.0</kafka.version>
     <maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
   </properties>
 
@@ -60,10 +62,109 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+
+    <repository>
+      <id>maven1-repo</id>
+      <name>maven1-repo</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+
+
+    <!--<repository>
+      <id>spring-release</id>
+      <name>spring-release</name>
+      <url>http://repo.spring.io/libs-release</url>
+    </repository>-->
+
+    <repository>
+      <id>sonatype-nexus-releases</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+
+
+    <repository>
+      <id>Maven-Central</id>
+      <name>Maven Central Repository</name>
+      <url>http://central.maven.org/maven2/</url>
+    </repository>
+
+    <repository>
+      <id>akka-data-replication</id>
+      <name>Patrik at Bintray</name>
+      <url>http://dl.bintray.com/patriknw/maven</url>
+    </repository>
+
+    <repository>
+      <id>cloudera</id>
+      <name>Cloudera repo</name>
+      <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
+    </repository>
+
+    <repository>
+      <id>vincent</id>
+      <name>vincent</name>
+      <url>http://dl.bintray.com/fvunicorn/maven</url>
+    </repository>
+
+    <repository>
+      <id>non</id>
+      <name>non</name>
+      <url>http://dl.bintray.com/non/maven</url>
+    </repository>
+
+
+
+
+    <repository>
+      <id>releases-oss.sonatype.org</id>
+      <name>Sonatype Releases Repository</name>
+      <url>http://oss.sonatype.org/content/repositories/releases/</url>
+    </repository>
+
+
+
+
+
+    <repository>
+      <id>maven-repo</id>
+      <name>maven-repo</name>
+      <url>http://repo.maven.apache.org/maven2</url>
+    </repository>
+
+
+    <repository>
+      <id>maven2-repo</id>
+      <name>maven2-repo</name>
+      <url>http://mvnrepository.com/artifact</url>
+    </repository>
   </repositories>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <configLocation>checkstyle/checkstyle.xml</configLocation>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+                        <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.12.0</version>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -144,6 +245,7 @@
           <version>${maven-exec-plugin.version}</version>
           <configuration>
             <cleanupDaemonThreads>false</cleanupDaemonThreads>
+
           </configuration>
         </plugin>
       </plugins>
@@ -185,7 +287,7 @@
         <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
-          <version>4.3.6</version>
+          <version>4.0.1</version>
           <scope>runtime</scope>
           <exclusions>
             <exclusion>
@@ -272,6 +374,11 @@
           </exclusions>
         </dependency>
         <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+          <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
           <groupId>com.fasterxml.jackson.module</groupId>
           <artifactId>jackson-module-scala_2.11</artifactId>
           <version>${jackson.version}</version>
@@ -309,13 +416,14 @@
     <dependency>
       <groupId>org.apache.beam</groupId>
       <artifactId>beam-sdks-java-io-kafka</artifactId>
-      <version>2.4.0</version>
+      <version>${beam.version}</version>
     </dependency>
+
 
       <dependency>
           <groupId>org.apache.kafka</groupId>
           <artifactId>kafka_2.11</artifactId>
-          <version>0.9.0.1</version>
+          <version>${kafka.version}</version>
       </dependency>
 
       <!-- Adds a dependency on the Beam Google Cloud Platform IO module. -->
@@ -338,6 +446,13 @@
           <artifactId>guava-jdk5</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <!--<version>3.2.16.RELEASE</version>-->
+      <version>4.3.18.RELEASE</version>
     </dependency>
 
     <dependency>
@@ -380,6 +495,12 @@
           <artifactId>guava-jdk5</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
     </dependency>
 
     <dependency>
@@ -443,5 +564,48 @@
       <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.3.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.beam</groupId>
+      <artifactId>beam-runners-flink_2.11</artifactId>
+      <version>${beam.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!--<dependency>
+      <groupId>org.trustedanalytics</groupId>
+      <artifactId>hadoop-utils</artifactId>
+      <version>0.5.3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.curator</groupId>
+          <artifactId>curator-client</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>-->
+
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-client</artifactId>
+      <version>1.4.4</version>
+    </dependency>
+
   </dependencies>
+
 </project>

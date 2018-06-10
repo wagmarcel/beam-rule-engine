@@ -15,15 +15,28 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.rules.conditions.functions;
 
-import org.oisp.conf.Config;
+import java.util.List;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+public interface Functions {
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+    boolean equal(String value1, List<String> values);
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
-    }
+    boolean notEqual(String value1, List<String> values);
+
+    boolean grater(String value1, String value2);
+
+    boolean graterEq(String value1, String value2);
+
+    boolean lowerEq(String value1, String value2);
+
+    boolean lower(String value1, String value2);
+
+    boolean like(String value1, String value2);
+
+    boolean between(String value1, List<String> value2);
+
+    boolean notBetween(String value1, List<String> value2);
+
 }

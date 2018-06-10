@@ -15,15 +15,16 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.utils;
 
-import org.oisp.conf.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+public final class LogHelper {
+    private LogHelper() {
+    }
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
-
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    public static Logger getLogger(Class clazz) {
+        return LoggerFactory.getLogger(clazz);
     }
 }

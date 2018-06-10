@@ -19,11 +19,12 @@ package org.oisp.transformation;
 
 import org.oisp.conf.Config;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+public class KafkaSourceObservationsProcessor extends KafkaSourceProcessor {
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_OBSERVATION_PROPERTY;
+
+    public KafkaSourceObservationsProcessor(Config userConfig) {
+       super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
     }
 }

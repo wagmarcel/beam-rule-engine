@@ -1,15 +1,29 @@
 package org.oisp.conf;
 
+
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
-public class Config {
-    public static String KAFKA_RULE_UPDATE_TOPIC_PROPERTY = "Kafka_Rule_Update_Topic_Property";
-    public static String KAFKA_BOOTSTRAP_SERVERS_PROPERTY = "Kafka_Bootstrap_Servers";
-    public static String KAFKA_ZOOKEEPER_SERVERS_PROPERTY = "Kafka_ZooKeeper_Servers";
+public class Config implements Serializable {
 
-    private HashMap<String, Object> conf;
-    Config(){
+    public static final String KAFKA_TOPIC_RULES_UPDATE_PROPERTY = "KAFKA_RULES_UPDATE_TOPIC";
+    public static final String KAFKA_ZOOKEEPER_PROPERTY = "KAFKA_URI_ZOOKEEPER";
+    public static final String KAFKA_URI_PROPERTY = "KAFKA_URI";
+    public static final String KAFKA_TOPIC_HEARTBEAT_PROPERTY = "KAFKA_HEARTBEAT_TOPIC";
+    public static final String KAFKA_HEARTBEAT_INTERVAL_PROPERTY = "KAFKA_HEARTBEAT_INTERVAL";
+    public static final String KAFKA_TOPIC_OBSERVATION_PROPERTY = "KAFKA_OBSERVATIONS_TOPIC";
+    public static final String DASHBOARD_TOKEN_PROPERTY = "DASHBOARD_TOKEN";
+    public static final String DASHBOARD_URL_PROPERTY = "DASHBOARD_URL";
+    public static final String DASHBOARD_STRICT_SSL_VERIFICATION = "DASHBOARD_STRICT_SSL";
+
+
+    private static HbaseProperties hbase;
+    private static KerberosProperties kbr;
+
+    private Map<String, Object> conf;
+    Config() {
         conf = new HashMap<String, Object>();
     }
 
@@ -17,16 +31,16 @@ public class Config {
         return conf.get(key);
     }
 
-    public Config put(String key, Object value){
-        conf.put(key,value);
+    public Config put(String key, Object value) {
+        conf.put(key, value);
         return this;
     }
-    public HashMap<String, Object> getHash(){
+    public Map<String, Object> getHash() {
         return conf;
     }
 
-    public Config put(HashMap<String, Object> conf_in){
-        conf = conf_in;
+    public Config put(Map<String, Object> config) {
+        conf = config;
         return this;
     }
     public String[] getStringArray(String key) {
@@ -37,5 +51,21 @@ public class Config {
             result = null;
         }
         return result;
+    }
+
+    public static HbaseProperties getHbase() {
+        return hbase;
+    }
+
+    public static void setHbase(HbaseProperties hbase) {
+        Config.hbase = hbase;
+    }
+
+    public static KerberosProperties getKbr() {
+        return kbr;
+    }
+
+    public static void setKbr(KerberosProperties kbr) {
+        Config.kbr = kbr;
     }
 }

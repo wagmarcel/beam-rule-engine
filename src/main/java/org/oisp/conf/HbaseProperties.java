@@ -15,15 +15,16 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.conf;
 
-import org.oisp.conf.Config;
+public final class HbaseProperties {
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+    public static final String ZOOKEEPER_QUORUM = "hbase.zookeeper.quorum";
+    public static final String TABLE_PREFIX = "hbase.table.prefix";
+    public static final String KERBEROS_AUTHENTICATION = "kerberos";
+    public static final String AUTHENTICATION_METHOD = "hadoop.security.authentication";
+    public static final String HBASE_AUTHENTICATION_METHOD = "hbase.security.authentication";
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
-
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    private HbaseProperties() {
     }
 }

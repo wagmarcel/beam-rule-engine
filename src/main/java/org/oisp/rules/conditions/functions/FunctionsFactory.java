@@ -15,15 +15,25 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.rules.conditions.functions;
 
-import org.oisp.conf.Config;
+import org.oisp.rules.DataType;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+public final class FunctionsFactory {
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+    private FunctionsFactory() {
+    }
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    public static Functions getFunctions(DataType dataType) {
+        switch (dataType) {
+            case BOOLEAN:
+                return new BooleanFunctions();
+            case NUMBER:
+                return new NumberFunctions();
+            case STRING:
+                return new StringFunctions();
+            default:
+                throw new IllegalArgumentException("Unknown dataType - " + dataType);
+        }
     }
 }

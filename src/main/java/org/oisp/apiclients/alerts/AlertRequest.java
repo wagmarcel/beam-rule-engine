@@ -15,15 +15,31 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.apiclients.alerts;
 
-import org.oisp.conf.Config;
+import java.util.List;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+class AlertRequest {
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+    public static final String MSG_TYPE = "alertsPush";
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    private String msgType;
+    private List<Alert> data;
+
+    public String getMsgType() {
+        return msgType;
     }
+
+    public void setMsgType(String msgType) {
+        this.msgType = msgType;
+    }
+
+    public List<Alert> getData() {
+        return data;
+    }
+
+    public void setData(List<Alert> data) {
+        this.data = data;
+    }
+
 }

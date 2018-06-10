@@ -15,15 +15,17 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.apiclients.rules;
 
-import org.oisp.conf.Config;
+import org.oisp.apiclients.InvalidDashboardResponseException;
+import org.oisp.apiclients.rules.model.ComponentRulesResponse;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+import java.util.List;
+import java.util.Set;
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
-    }
+public interface RulesApi {
+
+    List<ComponentRulesResponse> getActiveComponentsRules(Boolean synced) throws InvalidDashboardResponseException;
+    void markRulesSynchronized(Set<String> rulesIds) throws InvalidDashboardResponseException;
 }

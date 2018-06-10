@@ -15,15 +15,32 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.apiclients.rules.model;
 
-import org.oisp.conf.Config;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+import java.util.List;
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ComponentRulesResponse {
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    private String componentId;
+
+    private List<RuleResponse> rules;
+
+    public String getComponentId() {
+        return componentId;
+    }
+
+    public void setComponentId(String componentId) {
+        this.componentId = componentId;
+    }
+
+    public List<RuleResponse> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<RuleResponse> rules) {
+        this.rules = rules;
     }
 }

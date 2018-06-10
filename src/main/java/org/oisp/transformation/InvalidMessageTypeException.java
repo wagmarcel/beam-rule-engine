@@ -17,13 +17,21 @@
 
 package org.oisp.transformation;
 
-import org.oisp.conf.Config;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+public class InvalidMessageTypeException extends Exception {
+    public InvalidMessageTypeException() {
+        super();
+    }
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+    public InvalidMessageTypeException(String message) {
+        super(message);
+    }
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    public InvalidMessageTypeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public InvalidMessageTypeException(Throwable cause) {
+        super(cause);
     }
 }

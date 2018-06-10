@@ -15,15 +15,27 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.rules;
 
-import org.oisp.conf.Config;
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+public enum ConditionOperators {
+    AND("AND"), OR("OR"), NONE("NONE");
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
+    private String stringValue;
 
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    ConditionOperators(String value) {
+        this.stringValue = value;
+    }
+
+    public static ConditionOperators fromString(String value) {
+        if (value == null) {
+            return NONE;
+        }
+        for (ConditionOperators op : ConditionOperators.values()) {
+            if (op.stringValue.equals(value)) {
+                return op;
+            }
+        }
+        throw new IllegalArgumentException("Unrecognized operator value provided - " + value);
     }
 }

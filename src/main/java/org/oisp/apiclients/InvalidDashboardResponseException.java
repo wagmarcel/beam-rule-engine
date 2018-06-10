@@ -15,15 +15,18 @@
  *
  */
 
-package org.oisp.transformation;
+package org.oisp.apiclients;
 
-import org.oisp.conf.Config;
+public class InvalidDashboardResponseException extends Exception {
+    public InvalidDashboardResponseException(String message) {
+        super(message);
+    }
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
+    public InvalidDashboardResponseException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
-
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    public InvalidDashboardResponseException(Throwable cause) {
+        super(cause);
     }
 }
