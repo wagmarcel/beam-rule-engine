@@ -1,8 +1,8 @@
-package org.oisp.tasks.messages.controllers;
+package org.oisp.collection.controllers;
 
-import org.oisp.tasks.InvalidMessageTypeException;
-import org.oisp.tasks.messages.Observation;
-import io.gearpump.Message;
+import org.oisp.transformation.InvalidMessageTypeException;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Message;
 
 import java.util.List;
 

@@ -22,8 +22,8 @@ import com.google.gson.reflect.TypeToken;
 import org.oisp.data.BaseRepository;
 import org.oisp.data.HbaseValues;
 import org.oisp.data.RulesRepository;
-import org.oisp.tasks.messages.Rule;
-import io.gearpump.cluster.UserConfig;
+import org.oisp.collection.Rule;
+import org.oisp.conf.Config;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.*;
@@ -39,7 +39,7 @@ public class RulesHbaseRepository extends BaseRepository implements RulesReposit
     private static final byte[] columnName = Bytes.toBytes(HbaseValues.RULES_COLUMN_NAME);
     private final Gson gson;
 
-    public RulesHbaseRepository(UserConfig userConfig) {
+    public RulesHbaseRepository(Config userConfig) {
         super(userConfig);
         gson = new Gson();
     }

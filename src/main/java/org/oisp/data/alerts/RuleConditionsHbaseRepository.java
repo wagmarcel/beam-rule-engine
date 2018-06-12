@@ -21,10 +21,10 @@ import org.oisp.data.BaseRepository;
 import org.oisp.data.HbaseValues;
 import org.oisp.data.RowCreator;
 import org.oisp.data.RuleConditionsRepository;
-import org.oisp.tasks.messages.Observation;
-import org.oisp.tasks.messages.Rule;
-import org.oisp.tasks.messages.RulesWithObservation;
-import io.gearpump.cluster.UserConfig;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Rule;
+import org.oisp.collection.RulesWithObservation;
+import org.oisp.conf.Config;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -43,7 +43,7 @@ public class RuleConditionsHbaseRepository extends BaseRepository implements Rul
     private static final byte[] ruleComponentsFulfilledColumnName = Bytes.toBytes(HbaseValues.RULE_COMPONENTS_FULFILLED_COLUMN_NAME);
     private static final byte[] timbasedRuleComponentsColumnName = Bytes.toBytes(HbaseValues.TIMEBASED_RULE_COMPONENTS_COLUMN_NAME);
 
-    public RuleConditionsHbaseRepository(UserConfig userConfig) {
+    public RuleConditionsHbaseRepository(Config userConfig) {
         super(userConfig);
     }
 

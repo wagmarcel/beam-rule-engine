@@ -23,7 +23,7 @@ import org.oisp.transformation.InvalidMessageTypeException;
 import org.oisp.collection.Observation;
 import org.oisp.collection.Rule;
 import org.oisp.collection.RulesWithObservation;
-//import io.gearpump.Message;
+import org.oisp.collection.Message;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -38,8 +38,8 @@ public class InputMessageParser<ParsedObjectType> {
         gson = new Gson();
     }
 
-    public ParsedObjectType parseInputMapMessage(Object msg) throws InvalidMessageTypeException {
-        //Object msg = message.msg();
+    public ParsedObjectType parseInputMapMessage(Message message) throws InvalidMessageTypeException {
+        Object msg = message.msg();
         try {
             Type typeOfMessage = new TypeToken<Map<String, List<Rule>>>() { } .getType();
             return gson.fromJson((String) msg, typeOfMessage);

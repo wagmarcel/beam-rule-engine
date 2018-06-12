@@ -17,7 +17,7 @@
 
 package org.oisp.data;
 
-import org.oisp.tasks.messages.Rule;
+import org.oisp.collection.Rule;
 
 import java.io.IOException;
 import java.util.List;

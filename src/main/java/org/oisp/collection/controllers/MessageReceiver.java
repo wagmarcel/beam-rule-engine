@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
-package org.oisp.tasks.messages.controllers;
+package org.oisp.collection.controllers;
 
-import org.oisp.tasks.InvalidMessageTypeException;
-import org.oisp.tasks.messages.RulesWithObservation;
-import io.gearpump.Message;
+import org.oisp.transformation.InvalidMessageTypeException;
+import org.oisp.collection.RulesWithObservation;
+import org.oisp.collection.Message;
 
 import java.util.List;
 

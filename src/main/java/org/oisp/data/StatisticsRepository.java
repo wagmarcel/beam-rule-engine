@@ -19,7 +19,7 @@ package org.oisp.data;
 
 import org.oisp.data.alerts.ScanProperties;
 import org.oisp.data.statistics.StatisticsValues;
-import org.oisp.tasks.messages.Observation;
+import org.oisp.collection.Observation;
 
 import java.io.IOException;
 import java.util.List;

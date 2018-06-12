@@ -23,8 +23,8 @@ import org.oisp.data.RowCreator;
 import org.oisp.data.StatisticsRepository;
 import org.oisp.data.alerts.ScanManager;
 import org.oisp.data.alerts.ScanProperties;
-import org.oisp.tasks.messages.Observation;
-import io.gearpump.cluster.UserConfig;
+import org.oisp.collection.Observation;
+import org.oisp.conf.Config;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
@@ -46,7 +46,7 @@ public class StatisticsHbaseRepository extends BaseRepository implements Statist
     private static final String AGGREGATION_ERR_MSG = "Unable to read statistic data for componentId - %s";
 
 
-    public StatisticsHbaseRepository(UserConfig userConfig) {
+    public StatisticsHbaseRepository(Config userConfig) {
         super(userConfig);
     }
 

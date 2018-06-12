@@ -19,7 +19,7 @@ package org.oisp.data;
 
 import org.oisp.data.alerts.ComponentObservation;
 import org.oisp.data.alerts.ScanProperties;
-import org.oisp.tasks.messages.RulesWithObservation;
+import org.oisp.collection.RulesWithObservation;
 
 import java.io.IOException;
 import java.util.List;

@@ -25,7 +25,7 @@ import org.oisp.apiclients.rules.RulesApi;
 import org.oisp.apiclients.rules.model.ComponentRulesResponse;
 import org.oisp.parsers.RuleParser;
 import org.oisp.collection.Rule;
-import org.oisp.tasks.messages.controllers.OutputMessageCreator;
+import org.oisp.collection.controllers.OutputMessageCreator;
 import org.oisp.conf.Config;
 
 import java.util.List;

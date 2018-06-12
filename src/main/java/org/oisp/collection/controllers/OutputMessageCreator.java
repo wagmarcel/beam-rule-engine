@@ -15,11 +15,11 @@
  *
  */
 
-package org.oisp.tasks.messages.controllers;
+package org.oisp.collection.controllers;
 
 import com.google.gson.Gson;
-import org.oisp.tasks.TaskHelper;
-import io.gearpump.Message;
+import org.oisp.transformation.TaskHelper;
+import org.oisp.collection.Message;
 
 
 public class OutputMessageCreator<InnerMessageType> {

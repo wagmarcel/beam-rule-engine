@@ -14,22 +14,22 @@
  * limitations under the License.
  *
  */
-package org.oisp.tasks.messages.controllers;
+package org.oisp.collection.controllers;
 
-import org.oisp.tasks.messages.RulesWithObservation;
-import io.gearpump.Message;
-import io.gearpump.streaming.task.TaskContext;
+import org.oisp.collection.RulesWithObservation;
+import org.oisp.collection.Message;
+import org.apache.beam.sdk.transforms.DoFn.ProcessContext;
 
 import java.util.List;
 
 public class MessageSender {
 
-    private final TaskContext context;
+    private final ProcessContext context;
     private List<RulesWithObservation> rulesWithObservations;
     private static final int MAX_OBSERVATION_NUMBER = 1024;
     private static final int MAX_RULES_OBSERVATIONS_PER_MESSAGE = MAX_OBSERVATION_NUMBER / 8;
 
-    public MessageSender(TaskContext context) {
+    public MessageSender(ProcessContext context) {
         this.context = context;
     }
 

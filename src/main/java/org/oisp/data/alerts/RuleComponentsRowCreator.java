@@ -18,8 +18,8 @@
 package org.oisp.data.alerts;
 
 import org.oisp.data.RowCreator;
-import org.oisp.tasks.messages.Observation;
-import org.oisp.tasks.messages.Rule;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Rule;
 import org.apache.hadoop.hbase.util.Bytes;
 
 

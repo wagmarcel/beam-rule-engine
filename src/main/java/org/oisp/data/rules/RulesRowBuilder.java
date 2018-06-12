@@ -1,8 +1,8 @@
 package org.oisp.data.rules;
 
 import com.google.gson.Gson;
-import org.oisp.tasks.messages.Rule;
-import org.oisp.util.LogHelper;
+import org.oisp.collection.Rule;
+//import org.oisp.util.LogHelper;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 class RulesRowBuilder {
 
-    private final Logger logger = LogHelper.getLogger(RulesRowBuilder.class);
+    //private final Logger logger = LogHelper.getLogger(RulesRowBuilder.class);
 
     private final List<Delete> rowsToDelete;
     private final List<Put> rowsToInsert;
@@ -66,7 +66,7 @@ class RulesRowBuilder {
 
             //If there are no active rules for component, remove row connected with it
             if (activeRules.isEmpty()) {
-                logger.debug("Will remove rules for component - {}", componentId);
+                //logger.debug("Will remove rules for component - {}", componentId);
                 rowsToDelete.add(new Delete(key));
             } else {
                 Put put = new Put(key);
