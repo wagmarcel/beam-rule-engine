@@ -20,9 +20,9 @@ package org.oisp.rules.conditions;
 import org.oisp.data.RuleConditionsRepository;
 import org.oisp.data.alerts.ComponentObservation;
 import org.oisp.data.alerts.ScanProperties;
-import org.oisp.tasks.messages.Observation;
-import org.oisp.tasks.messages.RuleCondition;
-import org.oisp.util.LogHelper;
+import org.oisp.collection.Observation;
+import org.oisp.collection.RuleCondition;
+//import org.oisp.util.LogHelper;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class TimebasedConditionChecker extends BaseConditionChecker implements C
     private Observation observation;
     private ConditionFunctionChecker conditionFunctionChecker;
 
-    private static final Logger logger = LogHelper.getLogger(TimebasedConditionChecker.class);
+    //private static final Logger logger = LogHelper.getLogger(TimebasedConditionChecker.class);
 
     public TimebasedConditionChecker(RuleCondition ruleCondition, RuleConditionsRepository ruleConditionsRepository) {
         super(ruleCondition);
@@ -47,13 +47,13 @@ public class TimebasedConditionChecker extends BaseConditionChecker implements C
         try {
             return isConditionFulfilledForObservation() && isConditionFulfilledInTimeWindow();
         } catch (IOException e) {
-            logger.error("Unable to verify timebased condition for componentId - {}", observation.getCid(), e);
+            //logger.error("Unable to verify timebased condition for componentId - {}", observation.getCid(), e);
             return false;
         }
     }
 
     private boolean isConditionFulfilledInTimeWindow() throws IOException {
-        logger.debug("Time window length - {}, Time window start point - {}", getTimeWindowLength(), getTimeWindowStart());
+        //logger.debug("Time window length - {}, Time window start point - {}", getTimeWindowLength(), getTimeWindowStart());
         ComponentObservation componentObservation = findFirstFulfilledObservationOutsideTimeWidow();
 
         if (componentObservation != null) {

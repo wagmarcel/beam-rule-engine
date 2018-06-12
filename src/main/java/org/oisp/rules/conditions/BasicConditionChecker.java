@@ -17,8 +17,8 @@
 
 package org.oisp.rules.conditions;
 
-import org.oisp.tasks.messages.Observation;
-import org.oisp.tasks.messages.RuleCondition;
+import org.oisp.collection.Observation;
+import org.oisp.collection.RuleCondition;
 
 public class BasicConditionChecker extends BaseConditionChecker implements ConditionChecker {
 

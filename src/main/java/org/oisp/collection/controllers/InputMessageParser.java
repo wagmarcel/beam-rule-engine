@@ -38,8 +38,8 @@ public class InputMessageParser<ParsedObjectType> {
         gson = new Gson();
     }
 
-    public ParsedObjectType parseInputMapMessage(Message message) throws InvalidMessageTypeException {
-        Object msg = message.msg();
+    public ParsedObjectType parseInputMapMessage(Object msg) throws InvalidMessageTypeException {
+        //Object msg = message.msg();
         try {
             Type typeOfMessage = new TypeToken<Map<String, List<Rule>>>() { } .getType();
             return gson.fromJson((String) msg, typeOfMessage);

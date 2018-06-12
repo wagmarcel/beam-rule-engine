@@ -15,11 +15,16 @@
  *
  */
 
-package org.oisp.rules.conditions;
+package org.oisp.conf;
 
-import org.oisp.collection.Observation;
+public final class HbaseProperties {
 
-public interface ConditionChecker {
+    public static final String ZOOKEEPER_QUORUM = "hbase.zookeeper.quorum";
+    public static final String TABLE_PREFIX = "hbase.table.prefix";
+    public static final String KERBEROS_AUTHENTICATION = "kerberos";
+    public static final String AUTHENTICATION_METHOD = "hadoop.security.authentication";
+    public static final String HBASE_AUTHENTICATION_METHOD = "hbase.security.authentication";
 
-    boolean isConditionFulfilled(Observation observation);
+    private HbaseProperties() {
+    }
 }

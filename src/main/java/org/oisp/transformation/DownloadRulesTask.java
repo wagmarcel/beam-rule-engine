@@ -24,63 +24,60 @@ import org.oisp.apiclients.rules.DashboardRulesApi;
 import org.oisp.apiclients.rules.RulesApi;
 import org.oisp.apiclients.rules.model.ComponentRulesResponse;
 import org.oisp.parsers.RuleParser;
-import org.oisp.transformation.RuleEngineTask;
 import org.oisp.collection.Rule;
 import org.oisp.tasks.messages.controllers.OutputMessageCreator;
+import org.oisp.conf.Config;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidCatchingGenericException"})
-public class DownloadRulesTask extends RuleEngineTask {
+public class DownloadRulesTask  {
 
     private static final String TASK_NAME = "downloadRules";
     private final RulesApi rulesApi;
     private Map<String, List<Rule>> componentsRules;
 
-    public DownloadRulesTask(TaskContext context, UserConfig userConfig) {
-        this(context, userConfig, new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
+    public DownloadRulesTask(Config userConfig) {
+        this(userConfig, new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
     }
 
-    public DownloadRulesTask(TaskContext context, UserConfig userConfig, RulesApi rulesApi) {
-        super(context, userConfig);
+    public DownloadRulesTask(Config userConfig, RulesApi rulesApi) {
+        //super(context, userConfig);
         this.rulesApi = rulesApi;
     }
 
-    @Override
-    public void onStart(StartTime startTime) {
-        getLogger().debug("DownloadRulesTask starting...");
-        self().tell(new Message(START_MSG, now()), self());
-    }
-
-    @Override
-    public void onNext(Message message) {
-        getLogger().info("Synchronizing dashboard rules...");
-        try {
-            componentsRules = getComponentsRules();
-            getLogger().debug("Components Rules: {}", new Gson().toJson(componentsRules));
-            getContext().output(getOutputMessage());
-        } catch (InvalidDashboardResponseException e) {
-            getLogger().error("Unable to get active rules", e);
-        } catch (Exception e) {
-            getLogger().error("Unknown error during rules downloading.", e);
-        }
-    }
-
-    private Map<String, List<Rule>> getComponentsRules() throws InvalidDashboardResponseException {
-        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules();
-        RuleParser ruleParser = new RuleParser(componentsRules);
-        Map<String, List<Rule>> result = ruleParser.getComponentRules();
-        return result;
-    }
-
-    private Message getOutputMessage() {
-        return new OutputMessageCreator<Map<String, List<Rule>>>().createOutputMessage(componentsRules);
-    }
-
-    public static Processor getProcessor(UserConfig config, int parallelProcessorNumber) {
-        return createProcessor(DownloadRulesTask.class, config, parallelProcessorNumber, TASK_NAME);
-    }
+//    public void onStart(StartTime startTime) {
+//        getLogger().debug("DownloadRulesTask starting...");
+//        self().tell(new Message(START_MSG, now()), self());
+//    }
+//
+//    @Override
+//    public void onNext(Message message) {
+//        getLogger().info("Synchronizing dashboard rules...");
+//        try {
+//            componentsRules = getComponentsRules();
+//            getLogger().debug("Components Rules: {}", new Gson().toJson(componentsRules));
+//            getContext().output(getOutputMessage());
+//        } catch (InvalidDashboardResponseException e) {
+//            getLogger().error("Unable to get active rules", e);
+//        } catch (Exception e) {
+//            getLogger().error("Unknown error during rules downloading.", e);
+//        }
+//    }
+//
+//    private Map<String, List<Rule>> getComponentsRules() throws InvalidDashboardResponseException {
+//        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules();
+//        RuleParser ruleParser = new RuleParser(componentsRules);
+//        Map<String, List<Rule>> result = ruleParser.getComponentRules();
+//        return result;
+//    }
+//    private Message getOutputMessage() {
+//        return new OutputMessageCreator<Map<String, List<Rule>>>().createOutputMessage(componentsRules);
+//    }
+//
+//    public static Processor getProcessor(UserConfig config, int parallelProcessorNumber) {
+//        return createProcessor(DownloadRulesTask.class, config, parallelProcessorNumber, TASK_NAME);
+//    }
 
 }

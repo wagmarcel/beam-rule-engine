@@ -17,8 +17,8 @@
 
 package org.oisp.rules;
 
-import org.oisp.tasks.messages.Rule;
-import org.oisp.tasks.messages.RuleCondition;
+import org.oisp.collection.Rule;
+import org.oisp.collection.RuleCondition;
 
 import java.util.function.Predicate;
 import java.util.stream.Stream;

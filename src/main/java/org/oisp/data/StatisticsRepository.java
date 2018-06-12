@@ -15,11 +15,22 @@
  *
  */
 
-package org.oisp.rules.conditions;
+package org.oisp.data;
 
-import org.oisp.collection.Observation;
+import org.oisp.data.alerts.ScanProperties;
+import org.oisp.data.statistics.StatisticsValues;
+import org.oisp.tasks.messages.Observation;
 
-public interface ConditionChecker {
+import java.io.IOException;
+import java.util.List;
 
-    boolean isConditionFulfilled(Observation observation);
+public interface StatisticsRepository {
+
+    StatisticsValues getStatisticsValuesForObservation(ScanProperties scanProperties) throws IOException;
+
+    double getObservationCount(ScanProperties scanProperties) throws IOException;
+
+    void createTable() throws IOException;
+
+    void putObservationForStatisticsRuleCondition(List<Observation> observation) throws IOException;
 }

@@ -21,10 +21,10 @@ import org.oisp.data.RuleConditionsRepository;
 import org.oisp.data.StatisticsRepository;
 import org.oisp.rules.conditions.ConditionChecker;
 import org.oisp.rules.conditions.ConditionCheckerFactory;
-import org.oisp.tasks.messages.Observation;
-import org.oisp.tasks.messages.Rule;
-import org.oisp.tasks.messages.RuleCondition;
-import org.oisp.tasks.messages.RulesWithObservation;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Rule;
+import org.oisp.collection.RuleCondition;
+import org.oisp.collection.RulesWithObservation;
 
 import java.util.ArrayList;
 import java.util.List;

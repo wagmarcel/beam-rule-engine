@@ -1,5 +1,6 @@
 package org.oisp.conf;
 
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,6 +11,9 @@ public class Config {
     public static String DASHBOARD_TOKEN_PROPERTY = "DASHBOARD_TOKEN";
     public static String DASHBOARD_URL_PROPERTY = "DASHBOARD_URL";
     public static String DASHBOARD_STRICT_SSL_VERIFICATION = "DASHBOARD_STRICT_SSL";
+
+    public static HbaseProperties hbase;
+    public static KerberosProperties kbr;
 
     private HashMap<String, Object> conf;
     Config(){

@@ -15,11 +15,23 @@
  *
  */
 
-package org.oisp.rules.conditions;
+package org.oisp.transformation;
 
-import org.oisp.collection.Observation;
 
-public interface ConditionChecker {
+public class InvalidMessageTypeException extends Exception {
+    public InvalidMessageTypeException() {
+        super();
+    }
 
-    boolean isConditionFulfilled(Observation observation);
+    public InvalidMessageTypeException(String message) {
+        super(message);
+    }
+
+    public InvalidMessageTypeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public InvalidMessageTypeException(Throwable cause) {
+        super(cause);
+    }
 }

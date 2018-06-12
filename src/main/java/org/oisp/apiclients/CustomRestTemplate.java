@@ -58,7 +58,7 @@ public final class CustomRestTemplate {
             requestFactory = new HttpComponentsClientHttpRequestFactory();
             switchOffSSLVerification(requestFactory.getHttpClient());
         } catch (GeneralSecurityException e) {
-            logger.error("Error during disabling strict ssl certificate verification", e);
+            //logger.error("Error during disabling strict ssl certificate verification", e);
         }
         return requestFactory;
     }

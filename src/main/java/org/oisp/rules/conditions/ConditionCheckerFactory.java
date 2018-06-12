@@ -19,7 +19,7 @@ package org.oisp.rules.conditions;
 
 import org.oisp.data.RuleConditionsRepository;
 import org.oisp.data.StatisticsRepository;
-import org.oisp.tasks.messages.RuleCondition;
+import org.oisp.collection.RuleCondition;
 
 public final class ConditionCheckerFactory {
 

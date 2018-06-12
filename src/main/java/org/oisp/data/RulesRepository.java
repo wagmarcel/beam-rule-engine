@@ -15,11 +15,21 @@
  *
  */
 
-package org.oisp.rules.conditions;
+package org.oisp.data;
 
-import org.oisp.collection.Observation;
+import org.oisp.tasks.messages.Rule;
 
-public interface ConditionChecker {
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-    boolean isConditionFulfilled(Observation observation);
+
+public interface RulesRepository {
+
+    Map<String, List<Rule>> getComponentsRules(String accountId, Set<String> componentsIds) throws IOException;
+
+    void createTable() throws IOException;
+
+    void putRulesAndRemoveNotExistingOnes(Map<String, List<Rule>> componentsRules) throws IOException;
 }

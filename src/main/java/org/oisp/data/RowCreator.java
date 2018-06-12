@@ -15,11 +15,9 @@
  *
  */
 
-package org.oisp.rules.conditions;
+package org.oisp.data;
 
-import org.oisp.collection.Observation;
+public interface RowCreator {
 
-public interface ConditionChecker {
-
-    boolean isConditionFulfilled(Observation observation);
+    byte[] createRow(long timestamp);
 }

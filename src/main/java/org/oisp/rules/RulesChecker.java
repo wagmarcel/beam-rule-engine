@@ -18,9 +18,9 @@
 package org.oisp.rules;
 
 import org.oisp.data.RuleConditionsRepository;
-import org.oisp.tasks.messages.Observation;
-import org.oisp.tasks.messages.Rule;
-import org.oisp.tasks.messages.RulesWithObservation;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Rule;
+import org.oisp.collection.RulesWithObservation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -20,9 +20,9 @@ package org.oisp.rules.conditions;
 import org.oisp.data.StatisticsRepository;
 import org.oisp.data.alerts.ScanProperties;
 import org.oisp.data.statistics.StatisticsValues;
-import org.oisp.tasks.messages.Observation;
-import org.oisp.tasks.messages.RuleCondition;
-import org.oisp.util.LogHelper;
+import org.oisp.collection.Observation;
+import org.oisp.collection.RuleCondition;
+//import org.oisp.util.LogHelper;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class StatisticsConditionChecker extends BaseConditionChecker implements 
     private List<String> conditionValues;
     private final StatisticsRepository statisticsRepository;
     private Observation observation;
-    private static final Logger logger = LogHelper.getLogger(StatisticsConditionChecker.class);
+    //private static final Logger logger = LogHelper.getLogger(StatisticsConditionChecker.class);
 
     public StatisticsConditionChecker(RuleCondition ruleCondition, StatisticsRepository statisticsRepository) {
         super(ruleCondition);
@@ -54,10 +54,10 @@ public class StatisticsConditionChecker extends BaseConditionChecker implements 
             calculateStatistics();
             buildConditionValues();
             ConditionFunctionChecker conditionFunctionChecker = createConditionChecker();
-            logger.debug("Avg - {}, Std - {}, Values - {}", average, standardDeviation, Arrays.toString(conditionValues.toArray()));
+            //logger.debug("Avg - {}, Std - {}, Values - {}", average, standardDeviation, Arrays.toString(conditionValues.toArray()));
             return conditionFunctionChecker.isConditionFulfilled(observation.getValue());
         } catch (IOException e) {
-            logger.error("Unable to verify statistics condition for componentId - {}", observation.getCid(), e);
+            //logger.error("Unable to verify statistics condition for componentId - {}", observation.getCid(), e);
             return false;
         }
     }

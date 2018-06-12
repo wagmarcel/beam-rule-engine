@@ -15,11 +15,23 @@
  *
  */
 
-package org.oisp.rules.conditions;
+package org.oisp.data.statistics;
 
-import org.oisp.collection.Observation;
+public class StatisticsValues {
+    private final double average;
+    private final double standardDeviation;
 
-public interface ConditionChecker {
+    public StatisticsValues(double average, double standardDeviation) {
+        this.average = average;
+        this.standardDeviation = standardDeviation;
+    }
 
-    boolean isConditionFulfilled(Observation observation);
+
+    public double getAverage() {
+        return average;
+    }
+
+    public double getStandardDeviation() {
+        return standardDeviation;
+    }
 }

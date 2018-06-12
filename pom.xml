@@ -115,6 +115,32 @@
       <name>non</name>
       <url>http://dl.bintray.com/non/maven</url>
     </repository>
+
+
+
+
+    <repository>
+      <id>releases-oss.sonatype.org</id>
+      <name>Sonatype Releases Repository</name>
+      <url>http://oss.sonatype.org/content/repositories/releases/</url>
+    </repository>
+
+
+
+
+
+    <repository>
+      <id>maven-repo</id>
+      <name>maven-repo</name>
+      <url>http://repo.maven.apache.org/maven2</url>
+    </repository>
+
+
+    <repository>
+      <id>maven2-repo</id>
+      <name>maven2-repo</name>
+      <url>http://mvnrepository.com/artifact</url>
+    </repository>
   </repositories>
 
   <build>
@@ -504,5 +530,38 @@
       <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.trustedanalytics</groupId>
+      <artifactId>hadoop-utils</artifactId>
+      <version>0.5.3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.curator</groupId>
+          <artifactId>curator-client</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-client</artifactId>
+      <version>1.4.4</version>
+    </dependency>
+
   </dependencies>
+
+
 </project>

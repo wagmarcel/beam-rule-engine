@@ -22,7 +22,7 @@ import org.oisp.rules.Operators;
 import org.oisp.rules.conditions.functions.Functions;
 import org.oisp.rules.conditions.functions.FunctionsFactory;
 import org.oisp.rules.conditions.functions.IllegalOperatorException;
-import org.oisp.tasks.messages.RuleCondition;
+import org.oisp.collection.RuleCondition;
 
 import java.util.List;
 
