@@ -266,7 +266,7 @@
         <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
-          <version>4.4</version>
+          <version>4.0.1</version>
           <scope>runtime</scope>
           <exclusions>
             <exclusion>
@@ -353,6 +353,11 @@
           </exclusions>
         </dependency>
         <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+          <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
           <groupId>com.fasterxml.jackson.module</groupId>
           <artifactId>jackson-module-scala_2.11</artifactId>
           <version>${jackson.version}</version>
@@ -425,7 +430,7 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
       <!--<version>3.2.16.RELEASE</version>-->
-      <version>5.0.7.RELEASE</version>-
+      <version>4.3.18.RELEASE</version>-
     </dependency>
 
     <dependency>
@@ -535,10 +540,10 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.2.5</version>
+      <version>4.3.6</version>
     </dependency>
 
-    <dependency>
+    <!--<dependency>
       <groupId>org.trustedanalytics</groupId>
       <artifactId>hadoop-utils</artifactId>
       <version>0.5.3</version>
@@ -560,7 +565,7 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency>-->
 
     <dependency>
       <groupId>org.apache.hbase</groupId>

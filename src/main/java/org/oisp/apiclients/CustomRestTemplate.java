@@ -16,10 +16,15 @@
  */
 package org.oisp.apiclients;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
+//import org.apache.http.client.HttpClient;
+//import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+//import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustStrategy;
+import javax.net.ssl.SSLContext;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -52,28 +57,40 @@ public final class CustomRestTemplate {
         return template;
     }
 
-    private ClientHttpRequestFactory createHttpRequestFactory() {
-        HttpComponentsClientHttpRequestFactory requestFactory = null;
+    private ClientHttpRequestFactory createHttpRequestFactory(){
+        //HttpComponentsClientHttpRequestFactory requestFactory = null;
         try {
+            TrustStrategy acceptingTrustStrategy = new TrustStrategy() {
+                @Override
+                public boolean isTrusted(X509Certificate[] certificate, String authType) {
+                    return true;
+                }
+            };
+            SSLContext sslContext = new SSLContextBuilder()
+                    .loadTrustMaterial(null,acceptingTrustStrategy)
+                    .build();
+            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+            CloseableHttpClient httpClient = HttpClients.custom()
+                    .setSSLSocketFactory(csf)
+                    .build();
+            HttpComponentsClientHttpRequestFactory requestFactory =
+                    new HttpComponentsClientHttpRequestFactory();
             requestFactory = new HttpComponentsClientHttpRequestFactory();
-            switchOffSSLVerification(requestFactory.getHttpClient());
+            requestFactory.setHttpClient(httpClient);
+            return requestFactory;
+            //switchOffSSLVerification(requestFactory.getHttpClient().);
         } catch (GeneralSecurityException e) {
             //logger.error("Error during disabling strict ssl certificate verification", e);
         }
-        return requestFactory;
+        return null;
     }
 
-    private HttpClient switchOffSSLVerification(HttpClient httpClient) throws GeneralSecurityException {
-        TrustStrategy acceptingTrustStrategy = new TrustStrategy() {
-            @Override
-            public boolean isTrusted(X509Certificate[] certificate, String authType) {
-                return true;
-            }
-        };
-
-        SSLSocketFactory socketFactory = new SSLSocketFactory(acceptingTrustStrategy, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", SSL_PORT, socketFactory));
-
-        return httpClient;
-    }
+//    private HttpClient switchOffSSLVerification(HttpClient httpClient) throws GeneralSecurityException {
+//
+//        httpClient.
+//        SSLSocketFactory socketFactory = new SSLSocketFactory(acceptingTrustStrategy, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+//        httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", SSL_PORT, socketFactory));
+//
+//        return httpClient;
+//    }
 }
