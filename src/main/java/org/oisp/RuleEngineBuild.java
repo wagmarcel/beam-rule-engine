@@ -16,11 +16,16 @@ import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.joda.time.Duration;
-import org.oisp.conf.RuleEngineOptions;
-import org.oisp.conf.ConfigFactory;
+import org.oisp.conf.CmdlineOptions;
 import org.oisp.conf.Config;
+import org.oisp.conf.ExternalConfig;
+import org.oisp.transformation.DownloadRulesTask;
 import org.oisp.transformation.KafkaSourceProcessor;
 import org.oisp.transformation.KafkaSourceRulesUpdateProcessor;
+import org.oisp.collection.Rule;
+
+import java.util.Map;
+import java.util.List;
 
 /**
  * Rule-engine-test
@@ -32,6 +37,15 @@ class CombineKVFn extends DoFn<KafkaRecord<String, String>, KV<String, String>> 
     public void processElement(ProcessContext c) {
         KafkaRecord<String, String> record = c.element();
         KV<String, String> out_kv = KV.<String, String>of("key", record.getKV().getKey() + " " + record.getKV().getValue());
+        c.output(out_kv);
+    }
+}
+
+class MapListToStringFn extends DoFn<Map<String, List<Rule>>, KV<String, String>> {
+    @ProcessElement
+    public void processElement(ProcessContext c) {
+        Map<String, List<Rule>>   record = c.element();
+        KV<String, String> out_kv = KV.<String, String>of("key", record.keySet().toString());
         c.output(out_kv);
     }
 }
@@ -62,13 +76,15 @@ public abstract class RuleEngineBuild {
         PipelineOptions options = PipelineOptionsFactory
                 .fromArgs(args)
                 .withValidation()
-                .as(RuleEngineOptions.class);
+                .as(CmdlineOptions.class);
 
         Pipeline p = Pipeline.create(options);
         Pipeline heartbeat = Pipeline.create();
         Pipeline rulesUpdate = Pipeline.create(options);
 
-        Config conf = new ConfigFactory().getConfigFromArgs(((RuleEngineOptions) options).getJSONConfig());
+
+        ExternalConfig ext_conf = ExternalConfig.getConfigFromString(((CmdlineOptions) options).getJSONConfig());
+        Config conf = ext_conf.getConfig();
 
         // Test Pipeline
         p.apply(KafkaIO.<String, String>read()
@@ -102,10 +118,24 @@ public abstract class RuleEngineBuild {
                         .withValueSerializer(StringSerializer.class));
 
 
-        // First experiment with RulesUpdate pipeline from gearpump
+         //First experiment with RulesUpdate pipeline from gearpump
         KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
+        DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
+//        rulesUpdate.apply(KafkaIO.<String, String>read()
+//                .withBootstrapServers("localhost:9092")
+//                .withTopic("rules-update")
+//                .withKeyDeserializer(StringDeserializer.class)
+//                .withValueDeserializer(StringDeserializer.class)
+//                .updateConsumerProperties(ImmutableMap.of("group.id", "rule-engine"))
+//                .withLogAppendTime()
+//                .withReadCommitted()
+//                .commitOffsetsInFinalize()
+//                .withReadCommitted())
         rulesUpdate.apply(rulesKafka.getTransform())
                 .apply(ParDo.of(new CombineKVFromByteArrayFn()))
+                //.apply(ParDo.of(new CombineKVFn()))
+                .apply(ParDo.of(downloadRulesTask))
+                .apply(ParDo.of(new MapListToStringFn()))
                 .apply(KafkaIO.<String, String>write()
                                 .withBootstrapServers("localhost:9092")
                                 .withTopic("topic2")
@@ -113,7 +143,7 @@ public abstract class RuleEngineBuild {
                                 .withValueSerializer(StringSerializer.class));
 
         //heartbeat.run();
-        rulesUpdate.run();
-        p.run().waitUntilFinish();
+        rulesUpdate.run().waitUntilFinish();
+        //p.run().waitUntilFinish();
     }
 }

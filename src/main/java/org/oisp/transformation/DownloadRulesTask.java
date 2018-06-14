@@ -18,6 +18,8 @@
 package org.oisp.transformation;
 
 import com.google.gson.Gson;
+import org.apache.beam.sdk.io.kafka.KafkaRecord;
+import org.apache.beam.sdk.values.KV;
 import org.oisp.apiclients.DashboardConfigProvider;
 import org.oisp.apiclients.InvalidDashboardResponseException;
 import org.oisp.apiclients.rules.DashboardRulesApi;
@@ -27,12 +29,13 @@ import org.oisp.parsers.RuleParser;
 import org.oisp.collection.Rule;
 import org.oisp.collection.controllers.OutputMessageCreator;
 import org.oisp.conf.Config;
+import org.apache.beam.sdk.transforms.DoFn;
 
 import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidCatchingGenericException"})
-public class DownloadRulesTask  {
+public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, List<Rule>>>{
 
     private static final String TASK_NAME = "downloadRules";
     private final RulesApi rulesApi;
@@ -51,27 +54,27 @@ public class DownloadRulesTask  {
 //        getLogger().debug("DownloadRulesTask starting...");
 //        self().tell(new Message(START_MSG, now()), self());
 //    }
-//
-//    @Override
-//    public void onNext(Message message) {
-//        getLogger().info("Synchronizing dashboard rules...");
-//        try {
-//            componentsRules = getComponentsRules();
-//            getLogger().debug("Components Rules: {}", new Gson().toJson(componentsRules));
-//            getContext().output(getOutputMessage());
-//        } catch (InvalidDashboardResponseException e) {
-//            getLogger().error("Unable to get active rules", e);
-//        } catch (Exception e) {
-//            getLogger().error("Unknown error during rules downloading.", e);
-//        }
-//    }
-//
-//    private Map<String, List<Rule>> getComponentsRules() throws InvalidDashboardResponseException {
-//        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules();
-//        RuleParser ruleParser = new RuleParser(componentsRules);
-//        Map<String, List<Rule>> result = ruleParser.getComponentRules();
-//        return result;
-//    }
+
+    @ProcessElement
+    public void processElement(ProcessContext c) {
+        //getLogger().info("Synchronizing dashboard rules...");
+        try {
+            componentsRules = getComponentsRules();
+          //  getLogger().debug("Components Rules: {}", new Gson().toJson(componentsRules));
+          c.output(componentsRules);
+        } catch (InvalidDashboardResponseException e) {
+            //getLogger().error("Unable to get active rules", e);
+        } catch (Exception e) {
+            //getLogger().error("Unknown error during rules downloading.", e);
+        }
+    }
+
+    private Map<String, List<Rule>> getComponentsRules() throws InvalidDashboardResponseException {
+        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules();
+        RuleParser ruleParser = new RuleParser(componentsRules);
+        Map<String, List<Rule>> result = ruleParser.getComponentRules();
+        return result;
+    }
 //    private Message getOutputMessage() {
 //        return new OutputMessageCreator<Map<String, List<Rule>>>().createOutputMessage(componentsRules);
 //    }

@@ -17,15 +17,13 @@
 
 package org.oisp.transformation;
 
-import org.oisp.transformation.KafkaSourceProcessor;
-import org.oisp.conf.Config;
-import java.util.Properties;
+public final class TaskHelper {
 
-public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
-
-    public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_RULES_UPDATE_PROPERTY;
-
-    public KafkaSourceRulesUpdateProcessor(Config userConfig) {
-    	super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
+    private TaskHelper() {
     }
+
+    public static Long now() {
+        return System.currentTimeMillis();
+    }
+
 }

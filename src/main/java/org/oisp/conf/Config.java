@@ -5,12 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Config {
-    public static String KAFKA_RULE_UPDATE_TOPIC_PROPERTY = "Kafka_Rule_Update_Topic_Property";
-    public static String KAFKA_BOOTSTRAP_SERVERS_PROPERTY = "Kafka_Bootstrap_Servers";
-    public static String KAFKA_ZOOKEEPER_SERVERS_PROPERTY = "Kafka_ZooKeeper_Servers";
+
+    public static final String KAFKA_TOPIC_RULES_UPDATE_PROPERTY = "KAFKA_RULES_UPDATE_TOPIC";
+    public static final String KAFKA_ZOOKEEPER_PROPERTY = "KAFKA_URI_ZOOKEEPER";
+    public static final String KAFKA_URI_PROPERTY = "KAFKA_URI";
+    public static final String KAFKA_TOPIC_HEARTBEAT_PROPERTY = "KAFKA_HEARTBEAT_TOPIC";
+    public static final String KAFKA_HEARTBEAT_INTERVAL_PROPERTY = "KAFKA_HEARTBEAT_INTERVAL";
+    public static final String KAFKA_TOPIC_OBSERVATION_PROPERTY = "KAFKA_OBSERVATIONS_TOPIC";
     public static String DASHBOARD_TOKEN_PROPERTY = "DASHBOARD_TOKEN";
     public static String DASHBOARD_URL_PROPERTY = "DASHBOARD_URL";
     public static String DASHBOARD_STRICT_SSL_VERIFICATION = "DASHBOARD_STRICT_SSL";
+
 
     public static HbaseProperties hbase;
     public static KerberosProperties kbr;
@@ -21,7 +26,7 @@ public class Config {
     }
 
     public Object get(String key) {
-        return conf.get(key);
+            return conf.get(key);
     }
 
     public Config put(String key, Object value){

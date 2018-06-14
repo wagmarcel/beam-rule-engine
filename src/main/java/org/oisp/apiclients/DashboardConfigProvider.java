@@ -28,8 +28,15 @@ public class DashboardConfigProvider implements DashboardConfig {
     private final boolean strictSSL;
 
     public DashboardConfigProvider(Config userConfig) {
-        this.token = userConfig.get(Config.DASHBOARD_TOKEN_PROPERTY).toString();
-        this.url = userConfig.get(Config.DASHBOARD_URL_PROPERTY).toString();
+        Object token = userConfig.get(Config.DASHBOARD_TOKEN_PROPERTY);
+        Object url = userConfig.get(Config.DASHBOARD_URL_PROPERTY);
+
+        if (token != null) this.token = token.toString();
+        else this.token = null;
+
+        if (url != null) this.url = url.toString();
+        else this.url = null;
+
         this.strictSSL = parseStrictSSLOption(userConfig);
     }
 

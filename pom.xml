@@ -68,11 +68,11 @@
     </repository>
 
 
-    <repository>
+    <!--<repository>
       <id>spring-release</id>
       <name>spring-release</name>
       <url>http://repo.spring.io/libs-release</url>
-    </repository>
+    </repository>-->
 
     <repository>
       <id>sonatype-nexus-releases</id>
@@ -424,7 +424,8 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>3.2.16.RELEASE</version>
+      <!--<version>3.2.16.RELEASE</version>-->
+      <version>5.0.7.RELEASE</version>-
     </dependency>
 
     <dependency>
@@ -529,6 +530,12 @@
       <artifactId>mockito-core</artifactId>
       <version>${mockito.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.2.5</version>
     </dependency>
 
     <dependency>
