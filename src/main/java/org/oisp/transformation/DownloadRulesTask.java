@@ -31,6 +31,7 @@ import org.oisp.collection.controllers.OutputMessageCreator;
 import org.oisp.conf.Config;
 import org.apache.beam.sdk.transforms.DoFn;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 

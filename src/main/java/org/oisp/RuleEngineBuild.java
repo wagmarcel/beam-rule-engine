@@ -23,6 +23,7 @@ import org.oisp.transformation.DownloadRulesTask;
 import org.oisp.transformation.KafkaSourceProcessor;
 import org.oisp.transformation.KafkaSourceRulesUpdateProcessor;
 import org.oisp.collection.Rule;
+import org.oisp.coder.RuleCoder;
 
 import java.util.Map;
 import java.util.List;
@@ -119,6 +120,7 @@ public abstract class RuleEngineBuild {
 
 
          //First experiment with RulesUpdate pipeline from gearpump
+        rulesUpdate.getCoderRegistry().registerCoderForClass(Rule.class, RuleCoder.of());
         KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
         DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
 //        rulesUpdate.apply(KafkaIO.<String, String>read()

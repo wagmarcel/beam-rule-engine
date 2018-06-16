@@ -18,12 +18,15 @@
 package org.oisp.collection;
 
 import com.google.common.base.Objects;
+import org.apache.beam.sdk.coders.DefaultCoder;
 import org.oisp.rules.ConditionOperators;
 import org.oisp.rules.RuleStatus;
+import org.oisp.coder.RuleCoder;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@DefaultCoder(RuleCoder.class)
 public class Rule {
 
     private String id;

@@ -32,8 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.io.Serializable;
 
-public class RuleParser {
+public class RuleParser implements Serializable{
 
     private final List<ComponentRulesResponse> componentsRulesResponse;
 

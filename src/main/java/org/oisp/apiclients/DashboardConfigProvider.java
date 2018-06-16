@@ -19,9 +19,10 @@ package org.oisp.apiclients;
 
 import org.oisp.conf.Config;
 import org.oisp.conf.ConfigFactory;
+import java.io.Serializable;
 //import io.gearpump.cluster.UserConfig;
 
-public class DashboardConfigProvider implements DashboardConfig {
+public class DashboardConfigProvider implements DashboardConfig, Serializable {
 
     private final String token;
     private final String url;

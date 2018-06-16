@@ -30,18 +30,23 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Set;
+import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.IOException;
 
 
-public class DashboardRulesApi implements RulesApi {
+
+public class DashboardRulesApi implements RulesApi, Serializable {
 
     private final String url;
     private final String token;
+    private final DashboardConfig config;
     private static final String PATH = "/v1/api/";
     private static final String GET_COMPONENTS_RULES_PATH = "components/rules";
     private static final String UPDATE_RULES_PATH = "rules/synchronization_status/Sync";
 
     private static final String RULE_STATUS_NOT_SYNCHRONIZED = "NotSync";
-    private RestTemplate template;
+    private transient RestTemplate template;
 
     public DashboardRulesApi(DashboardConfig dashboardConfig) {
         this(dashboardConfig, CustomRestTemplate.build(dashboardConfig).getRestTemplate());
@@ -51,6 +56,7 @@ public class DashboardRulesApi implements RulesApi {
         token = dashboardConfig.getToken();
         url = dashboardConfig.getUrl() + PATH;
         template = restTemplate;
+        config = dashboardConfig;
     }
 
     @Override
@@ -99,4 +105,14 @@ public class DashboardRulesApi implements RulesApi {
     private String getToken() {
         return token;
     }
+
+
+    private void readObject(ObjectInputStream o)
+            throws IOException, ClassNotFoundException
+    {
+        o.defaultReadObject();
+        CustomRestTemplate.build(this.config).getRestTemplate();
+    }
+
+
 }
