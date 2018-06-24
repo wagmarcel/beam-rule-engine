@@ -19,9 +19,7 @@ import org.joda.time.Duration;
 import org.oisp.conf.CmdlineOptions;
 import org.oisp.conf.Config;
 import org.oisp.conf.ExternalConfig;
-import org.oisp.transformation.DownloadRulesTask;
-import org.oisp.transformation.KafkaSourceProcessor;
-import org.oisp.transformation.KafkaSourceRulesUpdateProcessor;
+import org.oisp.transformation.*;
 import org.oisp.collection.Rule;
 import org.oisp.coder.RuleCoder;
 
@@ -29,7 +27,6 @@ import java.util.Map;
 import java.util.List;
 import java.io.File;
 import org.apache.log4j.BasicConfigurator;
-import org.oisp.transformation.PersistRulesTask;
 
 /**
  * Rule-engine-test
@@ -86,6 +83,7 @@ public abstract class RuleEngineBuild {
         Pipeline p = Pipeline.create(options);
         Pipeline heartbeat = Pipeline.create();
         Pipeline rulesUpdate = Pipeline.create(options);
+        Pipeline observationsProcessing = Pipeline.create(options);
 
 
         ExternalConfig ext_conf = ExternalConfig.getConfigFromString(((CmdlineOptions) options).getJSONConfig());
@@ -128,28 +126,15 @@ public abstract class RuleEngineBuild {
         KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
         DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
         PersistRulesTask persistRulesTask = new PersistRulesTask(conf);
-//        rulesUpdate.apply(KafkaIO.<String, String>read()
-//                .withBootstrapServers("localhost:9092")
-//                .withTopic("rules-update")
-//                .withKeyDeserializer(StringDeserializer.class)
-//                .withValueDeserializer(StringDeserializer.class)
-//                .updateConsumerProperties(ImmutableMap.of("group.id", "rule-engine"))
-//                .withLogAppendTime()
-//                .withReadCommitted()
-//                .commitOffsetsInFinalize()
-//                .withReadCommitted())
         rulesUpdate.apply(rulesKafka.getTransform())
                 .apply(ParDo.of(new CombineKVFromByteArrayFn()))
-                //.apply(ParDo.of(new CombineKVFn()))
                 .apply(ParDo.of(downloadRulesTask))
                 .apply(ParDo.of(persistRulesTask));
-//                .apply(ParDo.of(new MapListToStringFn()))
-//                .apply(KafkaIO.<String, String>write()
-//                                .withBootstrapServers("localhost:9092")
-//                                .withTopic("topic2")
-//                                .withKeySerializer(StringSerializer.class)
-//                                .withValueSerializer(StringSerializer.class));
 
+
+        //The "real" pipeline
+        KafkaSourceObservationsProcessor observationsKafka = new KafkaSourceObservationsProcessor(conf);
+        observationsProcessing.apply(observationsKafka.getTransform());
         //heartbeat.run();
         rulesUpdate.run().waitUntilFinish();
         //p.run().waitUntilFinish();
