@@ -111,7 +111,7 @@ public class DashboardRulesApi implements RulesApi, Serializable {
             throws IOException, ClassNotFoundException
     {
         o.defaultReadObject();
-        CustomRestTemplate.build(this.config).getRestTemplate();
+        template = CustomRestTemplate.build(this.config).getRestTemplate();
     }
 
 

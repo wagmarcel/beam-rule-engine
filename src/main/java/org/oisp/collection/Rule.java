@@ -23,11 +23,12 @@ import org.oisp.rules.ConditionOperators;
 import org.oisp.rules.RuleStatus;
 import org.oisp.coder.RuleCoder;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @DefaultCoder(RuleCoder.class)
-public class Rule {
+public class Rule implements Serializable {
 
     private String id;
     private String accountId;

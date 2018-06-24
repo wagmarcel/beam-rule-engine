@@ -23,10 +23,11 @@ import org.oisp.rules.ConditionType;
 import org.oisp.rules.DataType;
 import org.oisp.rules.Operators;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class RuleCondition {
+public class RuleCondition implements Serializable {
 
     private List<String> values;
     private Operators operator;

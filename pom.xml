@@ -45,6 +45,7 @@
     <slf4j.version>1.7.25</slf4j.version>
     <spark.version>2.2.1</spark.version>
     <hadoop.version>2.7.3</hadoop.version>
+    <protobuf.version>2.5.0</protobuf.version>
     <maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
   </properties>
 
@@ -80,11 +81,6 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
 
-    <repository>
-      <id>gearpump-shaded-repo</id>
-      <name>Vincent at Bintray</name>
-      <url>http://dl.bintray.com/fvunicorn/maven</url>
-    </repository>
 
     <repository>
       <id>Maven-Central</id>
@@ -398,6 +394,7 @@
       <version>2.4.0</version>
     </dependency>
 
+
       <dependency>
           <groupId>org.apache.kafka</groupId>
           <artifactId>kafka_2.11</artifactId>
@@ -473,6 +470,12 @@
           <artifactId>guava-jdk5</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
     </dependency>
 
     <dependency>

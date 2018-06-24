@@ -27,13 +27,14 @@ import org.oisp.apiclients.rules.RulesApi;
 import org.oisp.apiclients.rules.model.ComponentRulesResponse;
 import org.oisp.parsers.RuleParser;
 import org.oisp.collection.Rule;
-import org.oisp.collection.controllers.OutputMessageCreator;
+import org.oisp.utils.LogHelper;
 import org.oisp.conf.Config;
 import org.apache.beam.sdk.transforms.DoFn;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
 
 @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidCatchingGenericException"})
 public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, List<Rule>>>{
@@ -41,7 +42,7 @@ public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, Lis
     private static final String TASK_NAME = "downloadRules";
     private final RulesApi rulesApi;
     private Map<String, List<Rule>> componentsRules;
-
+    private static final Logger LOG = LogHelper.getLogger(DownloadRulesTask.class);
     public DownloadRulesTask(Config userConfig) {
         this(userConfig, new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
     }
@@ -66,7 +67,7 @@ public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, Lis
         } catch (InvalidDashboardResponseException e) {
             //getLogger().error("Unable to get active rules", e);
         } catch (Exception e) {
-            //getLogger().error("Unknown error during rules downloading.", e);
+            LOG.error("Unknown error during rules downloading.", e);
         }
     }
 

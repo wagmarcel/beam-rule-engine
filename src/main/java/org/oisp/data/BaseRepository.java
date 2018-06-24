@@ -26,17 +26,18 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Table;
 
+import java.io.Serializable;
 import java.util.concurrent.Semaphore;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 
-public abstract class BaseRepository {
+public abstract class BaseRepository implements Serializable {
 
     private final String tableName;
     private final String zkQuorum;
     private final Config userConfig;
-    private Connection hbaseConnection;
+    private transient Connection hbaseConnection;
     private static Semaphore mutex = new Semaphore(1);
 
     public BaseRepository(Config userConfig) {

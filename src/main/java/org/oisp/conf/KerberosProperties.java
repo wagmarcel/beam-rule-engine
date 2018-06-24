@@ -44,7 +44,8 @@ public final class KerberosProperties {
 
     public static KerberosProperties fromConfig(Config config) {
         KerberosProperties kerberosProperties = new KerberosProperties();
-        kerberosProperties.enabled = config.get(Config.hbase.KERBEROS_AUTHENTICATION).equals(config.get(Config.hbase.AUTHENTICATION_METHOD));
+        kerberosProperties.enabled = (config.get(Config.hbase.KERBEROS_AUTHENTICATION) != null) && config.get(Config.hbase.KERBEROS_AUTHENTICATION).equals(config.get(Config.hbase.AUTHENTICATION_METHOD));
+        if (!kerberosProperties.enabled) return kerberosProperties;
         kerberosProperties.kdc = config.get(Config.kbr.KRB_KDC).toString();
         kerberosProperties.realm = config.get(Config.kbr.KRB_REALM).toString();
         kerberosProperties.user = config.get(Config.kbr.KRB_USER).toString();

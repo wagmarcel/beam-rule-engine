@@ -1,10 +1,11 @@
 package org.oisp.conf;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-public class Config {
+public class Config implements Serializable {
 
     public static final String KAFKA_TOPIC_RULES_UPDATE_PROPERTY = "KAFKA_RULES_UPDATE_TOPIC";
     public static final String KAFKA_ZOOKEEPER_PROPERTY = "KAFKA_URI_ZOOKEEPER";

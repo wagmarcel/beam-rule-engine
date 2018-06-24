@@ -27,6 +27,9 @@ import org.oisp.coder.RuleCoder;
 
 import java.util.Map;
 import java.util.List;
+import java.io.File;
+import org.apache.log4j.BasicConfigurator;
+import org.oisp.transformation.PersistRulesTask;
 
 /**
  * Rule-engine-test
@@ -79,6 +82,7 @@ public abstract class RuleEngineBuild {
                 .withValidation()
                 .as(CmdlineOptions.class);
 
+        //BasicConfigurator.configure();
         Pipeline p = Pipeline.create(options);
         Pipeline heartbeat = Pipeline.create();
         Pipeline rulesUpdate = Pipeline.create(options);
@@ -120,9 +124,10 @@ public abstract class RuleEngineBuild {
 
 
          //First experiment with RulesUpdate pipeline from gearpump
-        rulesUpdate.getCoderRegistry().registerCoderForClass(Rule.class, RuleCoder.of());
+        //rulesUpdate.getCoderRegistry().registerCoderForClass(Rule.class, RuleCoder.of());
         KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
         DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
+        PersistRulesTask persistRulesTask = new PersistRulesTask(conf);
 //        rulesUpdate.apply(KafkaIO.<String, String>read()
 //                .withBootstrapServers("localhost:9092")
 //                .withTopic("rules-update")
@@ -137,12 +142,13 @@ public abstract class RuleEngineBuild {
                 .apply(ParDo.of(new CombineKVFromByteArrayFn()))
                 //.apply(ParDo.of(new CombineKVFn()))
                 .apply(ParDo.of(downloadRulesTask))
-                .apply(ParDo.of(new MapListToStringFn()))
-                .apply(KafkaIO.<String, String>write()
-                                .withBootstrapServers("localhost:9092")
-                                .withTopic("topic2")
-                                .withKeySerializer(StringSerializer.class)
-                                .withValueSerializer(StringSerializer.class));
+                .apply(ParDo.of(persistRulesTask));
+//                .apply(ParDo.of(new MapListToStringFn()))
+//                .apply(KafkaIO.<String, String>write()
+//                                .withBootstrapServers("localhost:9092")
+//                                .withTopic("topic2")
+//                                .withKeySerializer(StringSerializer.class)
+//                                .withValueSerializer(StringSerializer.class));
 
         //heartbeat.run();
         rulesUpdate.run().waitUntilFinish();

@@ -30,14 +30,16 @@ import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public class RulesHbaseRepository extends BaseRepository implements RulesRepository {
+public class RulesHbaseRepository extends BaseRepository implements RulesRepository,Serializable {
 
     private static final byte[] columnFamily = Bytes.toBytes(HbaseValues.RULES_COLUMN_FAMILY);
     private static final byte[] columnName = Bytes.toBytes(HbaseValues.RULES_COLUMN_NAME);
-    private final Gson gson;
+    private transient Gson gson;
 
     public RulesHbaseRepository(Config userConfig) {
         super(userConfig);
@@ -118,5 +120,12 @@ public class RulesHbaseRepository extends BaseRepository implements RulesReposit
     private List<Rule> jsonToRules(byte[] result) {
         Type type = new TypeToken<List<Rule>>() { } .getType();
         return gson.fromJson(Bytes.toString(result), type);
+    }
+
+    private void readObject(ObjectInputStream o)
+            throws IOException, ClassNotFoundException
+    {
+        o.defaultReadObject();
+        gson = new Gson();
     }
 }
