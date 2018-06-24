@@ -69,14 +69,12 @@ public class PersistRulesTask extends DoFn<Map<String, List<Rule>>, byte[]> {
     public void processElement(ProcessContext c) {
         LOG.info("Persisting dashboard rules...");
         try {
-            Map<String, List<Rule>> rules = getInputMessage(new Message(c.element(), 0));
+            Map<String, List<Rule>> rules = c.element();
 
             if (!isRulesEmpty(rules)) {
                 rulesRepository.putRulesAndRemoveNotExistingOnes(rules);
                 rulesApi.markRulesSynchronized(getRulesIds(rules.values()));
             }
-        } catch (InvalidMessageTypeException e) {
-            LOG.error("Incorrect message received", e);
         } catch (IOException e) {
             LOG.error("Persisting error", e);
         } catch (InvalidDashboardResponseException e) {
