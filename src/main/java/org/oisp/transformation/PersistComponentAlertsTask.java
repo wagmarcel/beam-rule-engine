@@ -67,5 +67,5 @@ public class PersistComponentAlertsTask extends DoFn<List<RulesWithObservation>,
             LOG.error("Error during persisting rules in hbase.", e);
         }
     }
-    
+
 }
