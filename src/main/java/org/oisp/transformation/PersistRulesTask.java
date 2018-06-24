@@ -18,7 +18,6 @@
 package org.oisp.transformation;
 
 import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.values.PDone;
 import org.oisp.apiclients.DashboardConfigProvider;
 import org.oisp.apiclients.InvalidDashboardResponseException;
 import org.oisp.apiclients.rules.DashboardRulesApi;
@@ -26,10 +25,7 @@ import org.oisp.apiclients.rules.RulesApi;
 import org.oisp.data.RulesRepository;
 import org.oisp.data.rules.RulesHbaseRepository;
 import org.oisp.collection.Rule;
-import org.oisp.collection.controllers.InputMessageParser;
-import org.oisp.transformation.InvalidMessageTypeException;
 import org.oisp.conf.Config;
-import org.oisp.collection.Message;
 
 import org.oisp.utils.LogHelper;
 import org.slf4j.Logger;
@@ -89,9 +85,6 @@ public class PersistRulesTask extends DoFn<Map<String, List<Rule>>, byte[]> {
                 .collect(Collectors.toSet());
     }
 
-    private Map<String, List<Rule>> getInputMessage(Message message) throws InvalidMessageTypeException {
-        return new InputMessageParser<Map<String, List<Rule>>>().parseInputMapMessage(message);
-    }
 
     private boolean isRulesEmpty(Map<String, List<Rule>> rules) {
         return rules == null || rules.isEmpty();

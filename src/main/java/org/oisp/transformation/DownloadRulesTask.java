@@ -17,8 +17,6 @@
 
 package org.oisp.transformation;
 
-import com.google.gson.Gson;
-import org.apache.beam.sdk.io.kafka.KafkaRecord;
 import org.apache.beam.sdk.values.KV;
 import org.oisp.apiclients.DashboardConfigProvider;
 import org.oisp.apiclients.InvalidDashboardResponseException;
@@ -31,7 +29,6 @@ import org.oisp.utils.LogHelper;
 import org.oisp.conf.Config;
 import org.apache.beam.sdk.transforms.DoFn;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -48,14 +45,9 @@ public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, Lis
     }
 
     public DownloadRulesTask(Config userConfig, RulesApi rulesApi) {
-        //super(context, userConfig);
         this.rulesApi = rulesApi;
     }
 
-//    public void onStart(StartTime startTime) {
-//        getLogger().debug("DownloadRulesTask starting...");
-//        self().tell(new Message(START_MSG, now()), self());
-//    }
 
     @ProcessElement
     public void processElement(ProcessContext c) {
@@ -77,12 +69,5 @@ public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, Lis
         Map<String, List<Rule>> result = ruleParser.getComponentRules();
         return result;
     }
-//    private Message getOutputMessage() {
-//        return new OutputMessageCreator<Map<String, List<Rule>>>().createOutputMessage(componentsRules);
-//    }
-//
-//    public static Processor getProcessor(UserConfig config, int parallelProcessorNumber) {
-//        return createProcessor(DownloadRulesTask.class, config, parallelProcessorNumber, TASK_NAME);
-//    }
 
 }
