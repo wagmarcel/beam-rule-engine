@@ -19,6 +19,7 @@ import org.joda.time.Duration;
 import org.oisp.conf.CmdlineOptions;
 import org.oisp.conf.Config;
 import org.oisp.conf.ExternalConfig;
+import org.oisp.pipeline.ObservationPipelineBuilder;
 import org.oisp.transformation.*;
 import org.oisp.collection.Rule;
 import org.oisp.coder.RuleCoder;
@@ -83,7 +84,7 @@ public abstract class RuleEngineBuild {
         Pipeline p = Pipeline.create(options);
         Pipeline heartbeat = Pipeline.create();
         Pipeline rulesUpdate = Pipeline.create(options);
-        Pipeline observationsProcessing = Pipeline.create(options);
+        //Pipeline observationsProcessing = Pipeline.create(options);
 
 
         ExternalConfig ext_conf = ExternalConfig.getConfigFromString(((CmdlineOptions) options).getJSONConfig());
@@ -133,9 +134,12 @@ public abstract class RuleEngineBuild {
 
 
         //The "real" pipeline
-        KafkaSourceObservationsProcessor observationsKafka = new KafkaSourceObservationsProcessor(conf);
-        observationsProcessing.apply(observationsKafka.getTransform());
+        Pipeline observationPipeline = ObservationPipelineBuilder.build(options, conf);
+        //observationsProcessing.apply(observationsKafka.getTransform());
+
+
         //heartbeat.run();
+        observationPipeline.run();
         rulesUpdate.run().waitUntilFinish();
         //p.run().waitUntilFinish();
     }

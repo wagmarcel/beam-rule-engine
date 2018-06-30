@@ -19,11 +19,12 @@ package org.oisp.collection;
 
 import com.google.common.base.Objects;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 
-public class Observation {
+public class Observation implements Serializable {
 
     private String aid;
     private String cid;

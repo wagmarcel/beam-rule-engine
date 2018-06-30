@@ -19,10 +19,11 @@ package org.oisp.collection;
 
 import com.google.common.base.Objects;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class RulesWithObservation {
+public class RulesWithObservation implements Serializable {
 
     private final List<Rule> rules;
     private final Observation observation;
