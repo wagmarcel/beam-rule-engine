@@ -57,10 +57,14 @@ public class RulesObservationChecker {
 
         //TODO consider excluding rules with statistics conditions from here. Such rules processing can be time-consuming.
         //Such rules can be processed in another interval-triggered Task
+        //copy rules to allow to change fullfilled flag
+        List<Rule> crules = new ArrayList<Rule>();
         for (Rule rule : rules) {
-            if (isRuleFulfilledForComponent(rule)) {
-                rule.setFulfilled(true);
+            Rule crule = new Rule(rule);
+            if (isRuleFulfilledForComponent(crule)) {
+                crule.setFulfilled(true);
             }
+            crules.add(crule);
         }
         createFulfilledRules(rules);
         return fulfilledRules;

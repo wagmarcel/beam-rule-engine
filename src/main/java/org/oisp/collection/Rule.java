@@ -25,6 +25,7 @@ import org.oisp.coder.RuleCoder;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @DefaultCoder(RuleCoder.class)
@@ -38,6 +39,15 @@ public class Rule implements Serializable {
 
     private List<RuleCondition> conditions;
 
+    public Rule(){}
+    public Rule(Rule other){
+        id = (other.id != null)?new String(other.id):null;
+        accountId = other.accountId;
+        fulfilled = other.fulfilled;
+        conditionOperator = other.conditionOperator;
+        status = other.status;
+        conditions = other.conditions;
+    }
     public boolean hasTimebasedCondition() {
         return conditions.stream().anyMatch(c -> c.isTimebased());
     }

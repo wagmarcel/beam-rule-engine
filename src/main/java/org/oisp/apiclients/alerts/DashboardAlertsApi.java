@@ -28,18 +28,22 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class DashboardAlertsApi implements AlertsApi {
+public class DashboardAlertsApi implements AlertsApi, Serializable {
 
     private final String url;
     private final String token;
+    private DashboardConfigProvider config;
     private static final String PATH = "/v1/api/alerts";
     private List<RulesWithObservation> rulesWithObservations;
 
-    private final RestTemplate template;
+    private transient RestTemplate template;
 
     public DashboardAlertsApi(DashboardConfigProvider dashboardConfig) {
         this(dashboardConfig, CustomRestTemplate.build(dashboardConfig).getRestTemplate());
@@ -49,6 +53,7 @@ public class DashboardAlertsApi implements AlertsApi {
         token = dashboardConfig.getToken();
         url = dashboardConfig.getUrl() + PATH;
         template = restTemplate;
+        config = dashboardConfig;
     }
 
     private String getToken() {
@@ -103,5 +108,12 @@ public class DashboardAlertsApi implements AlertsApi {
         List<Condition> alertConditions = new ArrayList<>();
         alertConditions.add(new Condition(observation));
         return alertConditions;
+    }
+
+    private void readObject(ObjectInputStream o)
+            throws IOException, ClassNotFoundException
+    {
+        o.defaultReadObject();
+        template = CustomRestTemplate.build(config).getRestTemplate();
     }
 }
