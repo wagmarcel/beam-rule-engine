@@ -66,7 +66,7 @@ public class RulesObservationChecker {
             }
             crules.add(crule);
         }
-        createFulfilledRules(rules);
+        createFulfilledRules(crules);
         return fulfilledRules;
     }
 
