@@ -9,4 +9,9 @@ public interface CmdlineOptions extends PipelineOptions {
     @Default.String("")
     String getJSONConfig();
     void setJSONConfig(String value);
+
+    @Description("Pipeline name:(heartbeat|rules-update|observations)")
+    @Default.String("observations")
+    String getPipelineName();
+    void setPipelineName(String value);
 }
