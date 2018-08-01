@@ -22,11 +22,14 @@ public class HeartbeatPipelineBuilder {
     }
 
     static public Pipeline build(PipelineOptions options, Config conf) {
+
+        String serverUri = conf.get(Config.KAFKA_URI_PROPERTY).toString();
+        System.out.println("serverUri:" + serverUri);
         Pipeline p = Pipeline.create(options);
         p.apply(GenerateSequence.from(0).withRate(1, Duration.standardSeconds(1)))
                 .apply(ParDo.of(new StringToKVFn()))
                 .apply(KafkaIO.<String, String>write()
-                        .withBootstrapServers("localhost:9092")
+                        .withBootstrapServers(serverUri)
                         .withTopic("heartbeat")
                         .withKeySerializer(StringSerializer.class)
                         .withValueSerializer(StringSerializer.class));
