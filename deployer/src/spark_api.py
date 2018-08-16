@@ -22,6 +22,7 @@ import util
 import requests
 import os
 import subprocess
+import json
 
 
 class SparkApi:
@@ -62,6 +63,7 @@ class SparkApi:
                   self.spark_app_config + \
                   "' --pipelineName=full";
 
+        print json.dumps(self.spark_app_config);
         print ("Executing: ", cmdline);
         subprocess.call(cmdline, shell=True, stdout=subprocess.PIPE);
         response = "200 OK";
