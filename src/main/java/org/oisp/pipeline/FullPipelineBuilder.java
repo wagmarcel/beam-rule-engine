@@ -38,8 +38,10 @@ public class FullPipelineBuilder {
         @DoFn.ProcessElement
         public void processElement(ProcessContext c) {
             Long seqnum = c.element();
-            KV<String, String> out_kv = KV.<String, String>of("", "beam-rule-engine");
-            c.output(out_kv);
+            if (seqnum > 30 ) { // wait 30 seconds before sending heartbeats
+                KV<String, String> out_kv = KV.<String, String>of("", "rules-engine");
+                c.output(out_kv);
+            }
         }
     }
 
