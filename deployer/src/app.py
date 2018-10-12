@@ -22,7 +22,7 @@ import time
 
 import kafka
 
-from spark_api import SparkApi
+from flink_api import FlinkApi
 import cloudfoundry_bridge
 
 KAFKA_BROKER_TIMEOUT = 300
@@ -50,22 +50,21 @@ def wait_for_frontend():
 
 
 def main():
-    """Deploy app to local spark instance."""
+    """Deploy app to local flink instance."""
     rule_engine_jar_name = os.environ['RULE_ENGINE_PACKAGE_NAME']
 
     # Cloudfoundry needs frontend
-    wait_for_frontend()
+    #wait_for_frontend()
     cloud_bridge = cloudfoundry_bridge.CloudfoundryBridge()
     config = cloud_bridge.build_config(local=True)
 
     # We are only interested in port number because we deploy locally
-    spark_port = os.environ["SPARK"].split(":")[1]
-    spark_api = SparkApi(uri="http://localhost:{}".format(spark_port),
-                               credentials=cloud_bridge.spark_credentials)
-    print("Submitting application '{}' into spark ...".format(rule_engine_jar_name))
-    spark_api.submit_app(filename=rule_engine_jar_name,
+    #spark_port = os.environ["SPARK"].split(":")[1]
+    flink_api = FlinkApi(uri="flink-master:8081")
+    print("Submitting application '{}' into Flink ...".format(rule_engine_jar_name))
+    flink_api.submit_app(filename=rule_engine_jar_name,
                             app_name=config['application_name'],
-                            spark_app_config=config, force=True)
+                            flink_app_config=config, force=True)
 
 
 if __name__ == "__main__":

@@ -27,3 +27,14 @@ class SparkApiConfig(object):
     call_submit_with_args = call_submit + "?args="
     call_applist = prefix_master + "applist"
     call_appmaster = prefix + "/appmaster"
+
+
+class FlinkApiConfig(object):
+    version = "v1.5.4"
+    prefix = "/api/" + version
+    prefix_master = prefix + "/master/"
+    call_login = "/login"
+    call_submit = prefix_master + "submitapp"
+    call_submit_with_args = call_submit + "?args="
+    call_applist = prefix_master + "applist"
+    call_appmaster = prefix + "/appmaster"

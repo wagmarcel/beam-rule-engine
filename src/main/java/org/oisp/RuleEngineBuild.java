@@ -3,7 +3,7 @@ package org.oisp;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.io.GenerateSequence;
+//import org.apache.beam.runners.flink.*;
 import org.apache.beam.sdk.io.kafka.KafkaRecord;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
@@ -27,6 +27,9 @@ import org.oisp.transformation.*;
 import org.oisp.collection.Rule;
 import org.oisp.coder.RuleCoder;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.List;
 import java.io.File;
@@ -47,15 +50,24 @@ public abstract class RuleEngineBuild {
                 .as(CmdlineOptions.class);
 
         PipelineOptionsFactory.register(CmdlineOptions.class);
-        //options.setRunner(SparkRunner.class);
+        //options.setRunner(FlinkRunner.class);
         //BasicConfigurator.configure();
         Pipeline heartbeat;
         Pipeline rulesUpdate;
         Pipeline observationPipeline;
         Pipeline fullPipeline;
 
-
-        ExternalConfig ext_conf = ExternalConfig.getConfigFromString(((CmdlineOptions) options).getJSONConfig());
+        //read json config from file - needed because stupid mvn cannot read JSON from comdline. Unbelievable, but true.
+        String confFromFile = "";
+        try {
+            confFromFile = new String(Files.readAllBytes(Paths.get(((CmdlineOptions) options).getJSONConfig())));
+        }
+        catch (IOException e) {
+            System.out.println("Could not find config data: " + e);
+            System.exit(1);
+        }
+        System.out.println("JSON config retrieved: " + confFromFile);
+        ExternalConfig ext_conf = ExternalConfig.getConfigFromString(confFromFile);
         String pipelineName = ((CmdlineOptions) options).getPipelineName();
         Config conf;
 

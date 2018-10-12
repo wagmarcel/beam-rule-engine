@@ -15,6 +15,7 @@
 #
 
 echo local-deploy.sh called
-source version.properties &&
+export RULE_ENGINE_PACKAGE_NAME=rule-engine-bundled-0.1.jar
+#source version.properties &&
 cd deployer &&
 python src/app.py

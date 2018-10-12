@@ -27,7 +27,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <beam.version>2.4.0</beam.version>
+    <beam.version>2.7.0</beam.version>
 
     <bigquery.version>v2-rev374-1.22.0</bigquery.version>
     <google-clients.version>1.22.0</google-clients.version>
@@ -46,7 +46,7 @@
     <spark.version>2.2.1</spark.version>
     <hadoop.version>2.8.2</hadoop.version>
     <protobuf.version>2.5.0</protobuf.version>
-      <kafka.version>0.9.0.1</kafka.version>
+      <kafka.version>1.0.0</kafka.version>
     <maven-surefire-plugin.version>2.20.1</maven-surefire-plugin.version>
   </properties>
 
@@ -222,6 +222,7 @@
           <version>${maven-exec-plugin.version}</version>
           <configuration>
             <cleanupDaemonThreads>false</cleanupDaemonThreads>
+
           </configuration>
         </plugin>
       </plugins>
@@ -546,7 +547,12 @@
       <artifactId>httpclient</artifactId>
       <version>4.3.6</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.beam</groupId>
+      <artifactId>beam-runners-flink_2.11</artifactId>
+      <version>${beam.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!--<dependency>
       <groupId>org.trustedanalytics</groupId>
       <artifactId>hadoop-utils</artifactId>
