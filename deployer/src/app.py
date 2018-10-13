@@ -54,7 +54,7 @@ def main():
     rule_engine_jar_name = os.environ['RULE_ENGINE_PACKAGE_NAME']
 
     # Cloudfoundry needs frontend
-    #wait_for_frontend()
+    wait_for_frontend()
     cloud_bridge = cloudfoundry_bridge.CloudfoundryBridge()
     config = cloud_bridge.build_config(local=True)
 
