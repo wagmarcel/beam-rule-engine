@@ -80,9 +80,6 @@ class FlinkApi:
         print ("Executing: ", cmdline_observations);
         subprocess.Popen(cmdline_observations.split(" "));
 
-        print ("Executing: ", cmdline_observations);
-        subprocess.Popen(cmdline_observations.split(" "));
-
         print ("Executing: ", cmdline_heartbeat);
         subprocess.Popen(cmdline_heartbeat.split(" "));
 

@@ -15,21 +15,18 @@ ADD src /app/src
 
 WORKDIR /app
 
-RUN mvn clean package -Pspark-runner  -DskipTests
+RUN mvn clean package -Pflink-runner  -DskipTests
 
 
 
 
-FROM alpine:3.8
-EXPOSE 6066 7077 8080
+FROM flink:1.5.4-alpine
+EXPOSE 6123 8081
 
 
 
-RUN mkdir /app
-COPY --from=0 /app/target/rule-engine-bundled-0.1.jar /app
-RUN mkdir -p /opt/spark
-RUN wget https://archive.apache.org/dist/spark/spark-2.2.1/spark-2.2.1-bin-hadoop2.7.tgz -O /opt/spark/tmp.tgz
-RUN cd /opt/spark; tar xvzf tmp.tgz --strip 1; rm tmp.tgz
+RUN mkdir -p /app/target
+COPY --from=0 /app/target/rule-engine-bundled-0.1.jar /app/target
 
 RUN apk update
 RUN apk add python py-pip wget bash openjdk8-jre libc6-compat
