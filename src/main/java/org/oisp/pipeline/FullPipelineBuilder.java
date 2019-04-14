@@ -10,9 +10,12 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
+import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionView;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.joda.time.Duration;
 import org.oisp.collection.Observation;
+import org.oisp.collection.RulesWithObservation;
 import org.oisp.conf.Config;
 import org.apache.beam.sdk.Pipeline;
 import org.oisp.transformation.*;
@@ -57,10 +60,11 @@ public class FullPipelineBuilder {
 
         //Observation Pipeline
         KafkaSourceObservationsProcessor observationsKafka = new KafkaSourceObservationsProcessor(conf);
-        p.apply(observationsKafka.getTransform())
+        PCollection<List<RulesWithObservation>> rwo = p.apply(observationsKafka.getTransform())
                 .apply(ParDo.of(new KafkaToObservationFn()))
-                .apply(ParDo.of(new GetComponentRulesTask(conf)))
-                .apply(ParDo.of(new PersistObservationTask(conf)))
+                .apply(ParDo.of(new GetComponentRulesTask(conf)));
+        rwo.apply(ParDo.of(new CheckBasicRule()));
+        rwo.apply(ParDo.of(new PersistObservationTask(conf)))
                 .apply(ParDo.of(new CheckObservationInRulesTask(conf)))
                 .apply(ParDo.of(new PersistComponentAlertsTask(conf)))
                 .apply(ParDo.of(new CheckRulesTask(conf)))

@@ -34,13 +34,23 @@ public class RuleCondition implements Serializable {
     private ConditionType type;
     private String componentId;
     private DataType componentDataType;
+    private Boolean fulfilled;
+
     /**
      * timeLimit for timebased and statistics conditions (in seconds)
      */
+
     private Long timeLimit;
     private String ruleId;
     private Long minimalObservationCountInTimeWindow;
 
+    public Boolean getFulfilled() {
+        return fulfilled;
+    }
+
+    public void setFulfilled(Boolean fulfilled) {
+        this.fulfilled = fulfilled;
+    }
     public Long getMinimalObservationCountInTimeWindow() {
         return minimalObservationCountInTimeWindow;
     }
