@@ -1,20 +1,16 @@
 package org.oisp.transformation;
 
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.oisp.collection.Observation;
-import org.oisp.collection.RuleCondition;
-import org.oisp.collection.RulesWithObservation;
+import org.apache.beam.sdk.values.KV;
+import org.oisp.collection.*;
 import org.oisp.rules.conditions.BasicConditionChecker;
 import org.oisp.utils.LogHelper;
 import org.slf4j.Logger;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
-public class CheckBasicRule extends DoFn<List<RulesWithObservation>, List<RulesWithObservation>> {
+public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleFulfilmentState>> {
 
     private List<RulesWithObservation> observationRulesList;
     private List<RuleCondition> fullFilledRuleConditions;
@@ -23,7 +19,7 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, List<RulesW
     public void processElement(ProcessContext c) {
         //try {
             observationRulesList = c.element();
-            getFulfilledBasicRulesConditions();
+            sentFulfillmentState(c);
 
             //c.output(getActiveObservations());
         /*} catch (IOException e) {
@@ -31,20 +27,28 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, List<RulesW
         //}
     }
 
-    void getFulfilledBasicRulesConditions() {
+    void sentFulfillmentState(ProcessContext c) {
+        HashMap<String, RuleFulfilmentState> fulfilmentHash = new HashMap<>();
         for (RulesWithObservation rwo : observationRulesList) {
-            Observation observation = rwo.getObservation();
-            List<RuleCondition> ruleCondition = rwo.getRules().stream()
-                    .flatMap(ru -> ru.getConditions().stream())
-                    .filter(rc -> {
+            for (Rule rule: rwo.getRules()) {
+                fulfilmentHash.put(rule.getId(), new RuleFulfilmentState());
+                Observation observation = rwo.getObservation();
+                for (RuleCondition rc: rule.getConditions()) {
+                    List<Integer> ffH = fulfilmentHash.get(rule.getId()).getCondFulfillment();
+                    if (rc.getComponentId() == observation.getCid())
                         if (new BasicConditionChecker(rc).isConditionFulfilled(observation)){
-                            rc.setFulfilled(true);
+                            ffH.add(1);
                         } else {
-                            rc.setFulfilled(false);
-                        };
-                        return true;
-                    })
-                    .collect(toList());
+                            ffH.add(-1);
+                        }
+                    else {
+                        ffH.add(0);
+                    }
+                }
+                KV<String, RuleFulfilmentState> kvOutput = KV.of(rule.getId(), fulfilmentHash.get(rule.getId()));
+                c.output(kvOutput);
+            }
         }
+
     }
 }
