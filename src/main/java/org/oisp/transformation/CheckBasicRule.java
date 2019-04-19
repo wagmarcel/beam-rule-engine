@@ -7,48 +7,46 @@ import org.oisp.rules.conditions.BasicConditionChecker;
 import org.oisp.utils.LogHelper;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleFulfilmentState>> {
+import static org.oisp.collection.Rule.FulfillmentState.FALSE;
+import static org.oisp.collection.Rule.FulfillmentState.TRUE;
+import static org.oisp.collection.Rule.FulfillmentState.UNDECIDED;
+
+public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, Rule>> {
 
     private List<RulesWithObservation> observationRulesList;
     private List<RuleCondition> fullFilledRuleConditions;
     private static final Logger LOG = LogHelper.getLogger(CheckBasicRule.class);
     @ProcessElement
     public void processElement(ProcessContext c) {
-        //try {
-            observationRulesList = c.element();
-            sentFulfillmentState(c);
-
-            //c.output(getActiveObservations());
-        /*} catch (IOException e) {
-            LOG.error("Error during processing of rules", e);*/
-        //}
+        observationRulesList = c.element();
+        sendFulfillmentState(c);
     }
 
-    void sentFulfillmentState(ProcessContext c) {
-        HashMap<String, RuleFulfilmentState> fulfilmentHash = new HashMap<>();
+    void sendFulfillmentState(ProcessContext c) {
         for (RulesWithObservation rwo : observationRulesList) {
             for (Rule rule: rwo.getRules()) {
-                fulfilmentHash.put(rule.getId(), new RuleFulfilmentState());
+                Rule mutableRule = new Rule(rule);
                 Observation observation = rwo.getObservation();
-                for (RuleCondition rc: rule.getConditions()) {
-                    List<Integer> ffH = fulfilmentHash.get(rule.getId()).getCondFulfillment();
-                    if (rc.getComponentId() == observation.getCid())
+                List<Rule.FulfillmentState> ffS = new ArrayList<>();
+                for (RuleCondition rc: mutableRule.getConditions()) {
+                    if (rc.getComponentId().equals(observation.getCid()))
                         if (new BasicConditionChecker(rc).isConditionFulfilled(observation)){
-                            ffH.add(1);
+                            ffS.add(TRUE);
                         } else {
-                            ffH.add(-1);
+                            ffS.add(FALSE);
                         }
                     else {
-                        ffH.add(0);
+                        ffS.add(UNDECIDED);
                     }
                 }
-                KV<String, RuleFulfilmentState> kvOutput = KV.of(rule.getId(), fulfilmentHash.get(rule.getId()));
+                mutableRule.setCondFulfilment(ffS);
+                KV<String, Rule> kvOutput = KV.of(rule.getId(), mutableRule);
                 c.output(kvOutput);
             }
         }
-
     }
 }
