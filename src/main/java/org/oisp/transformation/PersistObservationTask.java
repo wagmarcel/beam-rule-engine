@@ -64,13 +64,13 @@ public class PersistObservationTask extends DoFn<List<RulesWithObservation>, Lis
         try {
             rulesWithObservation = c.element();
 
-            //Replicate observations data in gearpump's hbase in order for executing statistics aggregations
+            //Replicate obsTimestampsWithFulfillment data in gearpump's hbase in order for executing statistics aggregations
             List<Observation> observationsForStatisticsRules = filterObservationWithStatisticsRules();
             if (!observationsForStatisticsRules.isEmpty()) {
                 statisticsRepository.putObservationForStatisticsRuleCondition(observationsForStatisticsRules);
             }
 
-            //Check if observations data met logical conditions specified in timebased rules (eg. Equal 10, Greater than 5)
+            //Check if obsTimestampsWithFulfillment data met logical conditions specified in timebased rules (eg. Equal 10, Greater than 5)
             RuleComponentsStorageManager ruleComponentsStorageManager = new RuleComponentsStorageManager(ruleConditionsRepository, rulesWithObservation);
             ruleComponentsStorageManager.persistTimebasedRuleComponents();
 

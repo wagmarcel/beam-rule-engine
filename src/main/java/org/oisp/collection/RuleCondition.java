@@ -43,6 +43,35 @@ public class RuleCondition implements Serializable {
     private Long timeLimit;
     private String ruleId;
     private Long minimalObservationCountInTimeWindow;
+    private Observation observation;
+
+    public RuleCondition() {
+    }
+
+    public RuleCondition(RuleCondition other){
+        values = other.values;
+        operator = other.operator;
+        type = other.type;
+        componentId = other.componentId;
+        componentDataType = other.componentDataType;
+        fulfilled = other.fulfilled;
+        timeLimit = other.timeLimit;
+        ruleId = other.ruleId;
+        minimalObservationCountInTimeWindow = other.minimalObservationCountInTimeWindow;
+        observation = other.observation;
+    }
+
+    public void setTimeLimit(Long timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    public Observation getObservation() {
+        return observation;
+    }
+
+    public void setObservation(Observation observation) {
+        this.observation = observation;
+    }
 
     public Boolean getFulfilled() {
         return fulfilled;

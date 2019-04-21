@@ -27,7 +27,7 @@ import org.oisp.collection.RuleCondition;
 import java.util.List;
 
 
-class ConditionFunctionChecker {
+public class ConditionFunctionChecker {
 
     private final Operators operator;
     private final List<String> values;
@@ -35,7 +35,7 @@ class ConditionFunctionChecker {
 
     private Functions functions;
 
-    ConditionFunctionChecker(RuleCondition ruleCondition) {
+    public ConditionFunctionChecker(RuleCondition ruleCondition) {
         this(ruleCondition.getOperator(), ruleCondition.getValues(), ruleCondition.getComponentDataType());
     }
 

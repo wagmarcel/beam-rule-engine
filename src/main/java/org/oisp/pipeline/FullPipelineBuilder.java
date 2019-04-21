@@ -19,9 +19,7 @@ import org.apache.beam.sdk.values.PCollectionView;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import org.joda.time.Duration;
-import org.oisp.collection.Observation;
-import org.oisp.collection.Rule;
-import org.oisp.collection.RulesWithObservation;
+import org.oisp.collection.*;
 import org.oisp.conf.Config;
 import org.apache.beam.sdk.Pipeline;
 import org.oisp.transformation.*;
@@ -70,8 +68,9 @@ public class FullPipelineBuilder {
                 .apply(ParDo.of(new KafkaToObservationFn()))
                 .apply(ParDo.of(new GetComponentRulesTask(conf)));
         rwo.apply(ParDo.of(new CheckBasicRule()))
-                .apply(Window.<KV<String,Rule>>into(FixedWindows.of(Duration.standardSeconds(1))))
+                .apply(Window.<KV<String,RuleAndRuleCondition>>into(FixedWindows.of(Duration.millis(500))))
         .apply(Combine.perKey(new MonitorRule()));
+        rwo.apply(ParDo.of(new CheckTimeBasedRule()));
         rwo.apply(ParDo.of(new PersistObservationTask(conf)))
                 .apply(ParDo.of(new CheckObservationInRulesTask(conf)))
                 .apply(ParDo.of(new PersistComponentAlertsTask(conf)))

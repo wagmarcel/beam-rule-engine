@@ -40,7 +40,6 @@ public class Rule implements Serializable {
     private RuleStatus status;
 
     private List<RuleCondition> conditions;
-    private List<FulfillmentState> condFulfilment;
 
     public Rule(){}
     public Rule(Rule other){
@@ -50,15 +49,6 @@ public class Rule implements Serializable {
         conditionOperator = other.conditionOperator;
         status = other.status;
         conditions = other.conditions;
-        condFulfilment = other.condFulfilment;
-    }
-
-    public List<FulfillmentState> getCondFulfilment() {
-        return condFulfilment;
-    }
-
-    public void setCondFulfilment(List<FulfillmentState> condFulfilment) {
-        this.condFulfilment = condFulfilment;
     }
 
     public boolean hasTimebasedCondition() {

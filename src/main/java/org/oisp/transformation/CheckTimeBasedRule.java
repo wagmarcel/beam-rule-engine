@@ -1,20 +1,23 @@
 package org.oisp.transformation;
 
+import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.*;
-import org.oisp.rules.conditions.BasicConditionChecker;
+import org.oisp.rules.ConditionOperators;
+import org.oisp.rules.conditions.ConditionFunctionChecker;
 import org.oisp.utils.LogHelper;
-import org.oisp.collection.RuleAndRuleCondition;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import static org.oisp.collection.Rule.FulfillmentState.FALSE;
 import static org.oisp.collection.Rule.FulfillmentState.TRUE;
+import static org.oisp.collection.Rule.FulfillmentState.UNDECIDED;
 
-public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleAndRuleCondition>> {
-
+public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<String, RuleAndRuleCondition>> {
     private List<RulesWithObservation> observationRulesList;
     private List<RuleCondition> fullFilledRuleConditions;
     private static final Logger LOG = LogHelper.getLogger(CheckBasicRule.class);
@@ -25,28 +28,29 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
     }
 
     void sendFulfillmentState(ProcessContext c) {
+        List<Rule> mutableRuleList = new ArrayList<>();
         for (RulesWithObservation rwo : observationRulesList) {
             for (Rule rule: rwo.getRules()) {
                 Observation observation = rwo.getObservation();
-                for (int i=0; i < rule.getConditions().size(); i++) {
+                for (int i = 0; i< rule.getConditions().size();i++) {
                     RuleCondition rc = rule.getConditions().get(i);
-                    Rule.FulfillmentState condFulfillment;
-                    if (rc.isTimebased() || rc.isStatistics()) {
+                    if (!rc.isTimebased()) {
                         continue;
                     }
                     if (rc.getComponentId().equals(observation.getCid())) {
-                        if (new BasicConditionChecker(rc).isConditionFulfilled(observation)) {
-                            condFulfillment = TRUE;
+                        boolean result = false;
+                        if (new ConditionFunctionChecker(rc).isConditionFulfilled(observation.getValue())) {
+                            result = true;
                         } else {
-                            condFulfillment = FALSE;
+                            result = false;
                         }
-                        String key = rule.getId();
-                        RuleCondition mutableRc = new RuleCondition(rc);
-                        KV<String, RuleAndRuleCondition> kvOutput = KV.of(key, new RuleAndRuleCondition(rule, mutableRc, i));
-                        c.output(kvOutput);
+                        RuleCondition mutableRuleCondition = new RuleCondition(rc);
+                        RuleAndRuleCondition rarc = new RuleAndRuleCondition(rule, mutableRuleCondition, i);
+                        c.output(KV.of(rule.getId(), rarc));
                     }
                 }
             }
         }
     }
+
 }
