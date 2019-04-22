@@ -3,6 +3,9 @@ package org.oisp.pipeline;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.beam.sdk.coders.KvCoder;
+import org.apache.beam.sdk.coders.SerializableCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.GenerateSequence;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.kafka.KafkaRecord;
@@ -69,7 +72,8 @@ public class FullPipelineBuilder {
                 .apply(ParDo.of(new GetComponentRulesTask(conf)));
         rwo.apply(ParDo.of(new CheckBasicRule()))
                 .apply(Window.<KV<String,RuleAndRuleCondition>>into(FixedWindows.of(Duration.millis(500))))
-        .apply(Combine.perKey(new MonitorRule()));
+        .apply(Combine.perKey(new MonitorRule()))
+                .setCoder(KvCoder.of(StringUtf8Coder.of(), SerializableCoder.of(Rule.class)));
         rwo.apply(ParDo.of(new CheckTimeBasedRule()));
         rwo.apply(ParDo.of(new PersistObservationTask(conf)))
                 .apply(ParDo.of(new CheckObservationInRulesTask(conf)))

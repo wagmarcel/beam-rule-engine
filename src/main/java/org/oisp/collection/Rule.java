@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@DefaultCoder(RuleCoder.class)
+//@DefaultCoder(RuleCoder.class)
 public class Rule implements Serializable {
 
     public enum FulfillmentState {
