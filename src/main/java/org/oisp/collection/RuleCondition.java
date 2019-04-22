@@ -46,6 +46,7 @@ public class RuleCondition implements Serializable {
     private Observation observation;
 
     public RuleCondition() {
+        fulfilled = false;
     }
 
     public RuleCondition(RuleCondition other){

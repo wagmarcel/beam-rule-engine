@@ -3,9 +3,6 @@ package org.oisp.pipeline;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.apache.beam.sdk.coders.KvCoder;
-import org.apache.beam.sdk.coders.SerializableCoder;
-import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.GenerateSequence;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.kafka.KafkaRecord;
@@ -13,12 +10,10 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.windowing.AfterProcessingTime;
 import org.apache.beam.sdk.transforms.windowing.FixedWindows;
 import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PCollectionView;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import org.joda.time.Duration;
@@ -70,11 +65,15 @@ public class FullPipelineBuilder {
         PCollection<List<RulesWithObservation>> rwo = p.apply(observationsKafka.getTransform())
                 .apply(ParDo.of(new KafkaToObservationFn()))
                 .apply(ParDo.of(new GetComponentRulesTask(conf)));
-        rwo.apply(ParDo.of(new CheckBasicRule()))
-                .apply(Window.<KV<String,RuleAndRuleCondition>>into(FixedWindows.of(Duration.millis(500))))
-        .apply(Combine.perKey(new MonitorRule()))
-                .setCoder(KvCoder.of(StringUtf8Coder.of(), SerializableCoder.of(Rule.class)));
-        rwo.apply(ParDo.of(new CheckTimeBasedRule()));
+        rwo
+                .apply(ParDo.of(new CheckBasicRule()))
+
+
+                .apply(ParDo.of(new PersistRuleState()))
+                .apply(Window.<KV<String,Rule>>into(FixedWindows.of(Duration.standardMinutes(1))))
+                .apply(Combine.perKey(new MonitorRule()));
+                //.setCoder(KvCoder.of(StringUtf8Coder.of(), SerializableCoder.of(Rule.class)));
+        //rwo.apply(ParDo.of(new CheckTimeBasedRule()));
         rwo.apply(ParDo.of(new PersistObservationTask(conf)))
                 .apply(ParDo.of(new CheckObservationInRulesTask(conf)))
                 .apply(ParDo.of(new PersistComponentAlertsTask(conf)))

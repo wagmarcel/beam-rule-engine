@@ -51,6 +51,7 @@ public class KafkaSourceProcessor {
         consumerProperties.put("zookeeper.connect", zookeeperQuorum);
         consumerProperties.put("group.id", "beam");
         //consumerProperties.put("offsets.storage", "kafka");
+        consumerProperties.put("enable.auto.commit", "true");
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
         transform = KafkaIO.<String, byte[]>read()

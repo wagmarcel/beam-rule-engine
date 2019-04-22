@@ -40,11 +40,9 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
                         } else {
                             condFulfillment = false;
                         }
-                        String key = rule.getId();
                         RuleCondition mutableRc = new RuleCondition(rc);
                         mutableRc.setFulfilled(condFulfillment);
-                        KV<String, RuleAndRuleCondition> kvOutput = KV.of(key, new RuleAndRuleCondition(rule, mutableRc, i));
-                        c.output(kvOutput);
+                        c.output(KV.of(mutableRc.getRuleId(), new RuleAndRuleCondition(rule, mutableRc, i)));
                     }
                 }
             }
