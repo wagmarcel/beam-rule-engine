@@ -30,18 +30,19 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
                 Observation observation = rwo.getObservation();
                 for (int i=0; i < rule.getConditions().size(); i++) {
                     RuleCondition rc = rule.getConditions().get(i);
-                    Rule.FulfillmentState condFulfillment;
+                    Boolean condFulfillment;
                     if (rc.isTimebased() || rc.isStatistics()) {
                         continue;
                     }
                     if (rc.getComponentId().equals(observation.getCid())) {
                         if (new BasicConditionChecker(rc).isConditionFulfilled(observation)) {
-                            condFulfillment = TRUE;
+                            condFulfillment = true;
                         } else {
-                            condFulfillment = FALSE;
+                            condFulfillment = false;
                         }
                         String key = rule.getId();
                         RuleCondition mutableRc = new RuleCondition(rc);
+                        mutableRc.setFulfilled(condFulfillment);
                         KV<String, RuleAndRuleCondition> kvOutput = KV.of(key, new RuleAndRuleCondition(rule, mutableRc, i));
                         c.output(kvOutput);
                     }

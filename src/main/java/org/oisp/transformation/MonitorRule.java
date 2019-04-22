@@ -5,6 +5,7 @@ import org.oisp.collection.Rule;
 import org.oisp.collection.RuleAndRuleCondition;
 import org.oisp.collection.RuleCondition;
 import org.oisp.rules.ConditionOperators;
+import org.oisp.transformation.acumulators.MonitorRuleAccum;
 
 import java.util.*;
 
@@ -12,59 +13,52 @@ import static org.oisp.collection.Rule.FulfillmentState.FALSE;
 import static org.oisp.collection.Rule.FulfillmentState.TRUE;
 import static org.oisp.collection.Rule.FulfillmentState.UNDECIDED;
 
-public class MonitorRule extends Combine.CombineFn<RuleAndRuleCondition, MonitorRule.Accum, Rule> {
+public class MonitorRule extends Combine.CombineFn<RuleAndRuleCondition, MonitorRuleAccum, Rule> {
 
-    class Accum {
-        Rule rule;
-        Map<Integer, RuleCondition> ruleconditions;
-        Rule.FulfillmentState fulfillmentState;
-    }
+
     @Override
-    public Accum createAccumulator() {
-        Accum accum = new Accum();
-        accum.fulfillmentState = UNDECIDED;
-        accum.rule = null;
-        accum.ruleconditions = new HashMap<Integer, RuleCondition>();
+    public MonitorRuleAccum createAccumulator() {
+        MonitorRuleAccum accum = new MonitorRuleAccum();
         return accum;
     }
 
     @Override
-    public Accum addInput(Accum  accum, RuleAndRuleCondition input) {
+    public MonitorRuleAccum addInput(MonitorRuleAccum  accum, RuleAndRuleCondition input) {
         // When accum does not have a rule ID, take over whole rule
         if (input == null || input.getRule() == null || input.getRc() == null) {
             return accum;
         }
-        if (accum.rule == null) {
-            accum.rule = input.getRule();
+        if (accum.getRule() == null) {
+            accum.setRule(input.getRule());
         }
         else { // merge fulfillment state
-            accum.ruleconditions.put(input.getIndex(), input.getRc());
+            accum.getRuleconditions().put(input.getIndex(), input.getRc());
         }
         return accum;
     }
 
     @Override
-    public Accum mergeAccumulators(Iterable<Accum> accums) {
-        Accum merged = createAccumulator();
-        for (Accum accum : accums) {
-            if (accum == null || accum.rule == null) { //why would that happen?
+    public MonitorRuleAccum mergeAccumulators(Iterable<MonitorRuleAccum> accums) {
+        MonitorRuleAccum merged = createAccumulator();
+        for (MonitorRuleAccum accum : accums) {
+            if (accum == null || accum.getRule() == null) { //why would that happen?
                 continue;
             }
-            if (merged.rule == null) {
+            if (merged.getRule() == null) {
                 merged = accum;
             }
-            assert(accum.rule.getId() == merged.rule.getId());
-            for(Map.Entry<Integer, RuleCondition> entry : accum.ruleconditions.entrySet()) {
+            assert(accum.getRule().getId() == merged.getRule().getId());
+            for(Map.Entry<Integer, RuleCondition> entry : accum.getRuleconditions().entrySet()) {
                 Integer index = entry.getKey();
                 RuleCondition rc = entry.getValue();
-                if (merged.ruleconditions.get(index) != null) {
-                    if (merged.ruleconditions.get(index).getFulfilled() == false) {
+                if (merged.getRuleconditions().get(index) != null) {
+                    if (merged.getRuleconditions().get(index).getFulfilled() == false) {
                         if (rc.getFulfilled() == true) {
-                            merged.ruleconditions.put(index, rc);
+                            merged.getRuleconditions().put(index, rc);
                         }
                     }
                 } else {
-                    merged.ruleconditions.put(index, rc);
+                    merged.getRuleconditions().put(index, rc);
                 }
             }
         }
@@ -72,25 +66,25 @@ public class MonitorRule extends Combine.CombineFn<RuleAndRuleCondition, Monitor
     }
 
     @Override
-    public Rule extractOutput(Accum accum) {
-        if (accum.rule != null) {
-            if (accum.rule.getConditionOperator() == ConditionOperators.AND) {
-                if (accum.rule.getConditions().size() == accum.ruleconditions.size()) {
+    public Rule extractOutput(MonitorRuleAccum accum) {
+        if (accum.getRule() != null) {
+            if (accum.getRule().getConditionOperator() == ConditionOperators.AND) {
+                if (accum.getRule().getConditions().size() == accum.getRuleconditions().size()) {
                     // AND operator is only checked when all ruleconditions are available
                     Boolean result = true;
-                    for (RuleCondition rc : accum.ruleconditions.values()) {
+                    for (RuleCondition rc : accum.getRuleconditions().values()) {
                         result &= rc.getFulfilled();
                     }
                     if (result) {
-                        Rule mutableRule = new Rule(accum.rule);
-                        mutableRule.setConditions(new ArrayList<>(accum.ruleconditions.values()));
+                        Rule mutableRule = new Rule(accum.getRule());
+                        mutableRule.setConditions(new ArrayList<>(accum.getRuleconditions().values()));
                         return mutableRule;
                     }
                 }
             } else {
-                for (RuleCondition rc : accum.ruleconditions.values()) {
+                for (RuleCondition rc : accum.getRuleconditions().values()) {
                     if (rc.getFulfilled()) {
-                        Rule mutableRule = new Rule(accum.rule);
+                        Rule mutableRule = new Rule(accum.getRule());
                         mutableRule.setConditions(new ArrayList<>(Arrays.asList(rc)));
                         return mutableRule;
                     }
