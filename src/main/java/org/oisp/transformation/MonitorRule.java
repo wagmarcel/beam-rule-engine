@@ -4,6 +4,8 @@ import org.apache.beam.sdk.transforms.Combine;
 import org.oisp.collection.Rule;
 import org.oisp.collection.RuleCondition;
 import org.oisp.rules.ConditionOperators;
+import org.oisp.utils.LogHelper;
+import org.slf4j.Logger;
 
 public class MonitorRule extends Combine.CombineFn<Rule, Rule, Rule> {
     @Override
@@ -13,7 +15,9 @@ public class MonitorRule extends Combine.CombineFn<Rule, Rule, Rule> {
 
     @Override
     public Rule addInput(Rule accumulator, Rule input) {
-        //merge the true states together
+        if (input == null) {
+            return accumulator;
+        }
         if (accumulator.getId() == null) {
             accumulator = input;
         } else {
@@ -28,7 +32,6 @@ public class MonitorRule extends Combine.CombineFn<Rule, Rule, Rule> {
 
     @Override
     public Rule mergeAccumulators(Iterable<Rule> accumulators) {
-        // ?? can you write this ??
         Rule merged = createAccumulator();
         for (Rule accum : accumulators) {
             if (accum == null || accum.getId() == null) {
@@ -56,6 +59,7 @@ public class MonitorRule extends Combine.CombineFn<Rule, Rule, Rule> {
                     result &= rc.getFulfilled();
                 }
                 if (result) {
+                    System.out.println("Marcel372: Rule.And triggered: " + accumulator.getId());
                     return accumulator;
                 }
             } else {
@@ -64,6 +68,7 @@ public class MonitorRule extends Combine.CombineFn<Rule, Rule, Rule> {
                     result |= rc.getFulfilled();
                 }
                 if (result) {
+                    System.out.println("Marcel982: Rule.Or triggered: " + accumulator.getId());
                     return accumulator;
                 }
 

@@ -70,7 +70,7 @@ public class FullPipelineBuilder {
 
 
                 .apply(ParDo.of(new PersistRuleState()))
-                .apply(Window.<KV<String,Rule>>into(FixedWindows.of(Duration.standardMinutes(1))))
+                .apply(Window.<KV<String,Rule>>into(FixedWindows.of(Duration.standardSeconds(1))))
                 .apply(Combine.perKey(new MonitorRule()));
                 //.setCoder(KvCoder.of(StringUtf8Coder.of(), SerializableCoder.of(Rule.class)));
         //rwo.apply(ParDo.of(new CheckTimeBasedRule()));
