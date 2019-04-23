@@ -45,6 +45,7 @@ public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<Stri
                             result = false;
                         }
                         RuleCondition mutableRuleCondition = new RuleCondition(rc);
+                        mutableRuleCondition.setObservation(observation);
                         RuleAndRuleCondition rarc = new RuleAndRuleCondition(rule, mutableRuleCondition, i);
                         c.output(KV.of(rule.getId(), rarc));
                     }

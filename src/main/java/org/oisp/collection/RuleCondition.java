@@ -25,6 +25,7 @@ import org.oisp.rules.Operators;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.SortedMap;
 
 
 public class RuleCondition implements Serializable {
@@ -43,10 +44,20 @@ public class RuleCondition implements Serializable {
     private Long timeLimit;
     private String ruleId;
     private Long minimalObservationCountInTimeWindow;
-    private Observation observation;
+    private Observation observation; // Observation which triggered fulfillment of the condition
+    private SortedMap<Long, Boolean> timeBasedState; //contains the timeBased max found timemstamp difference of fulfilling elements
+
+    public SortedMap<Long, Boolean> getTimeBasedState() {
+        return timeBasedState;
+    }
+
+    public void setTimeBasedState(SortedMap<Long, Boolean> timeBasedState) {
+        this.timeBasedState = timeBasedState;
+    }
 
     public RuleCondition() {
         fulfilled = false;
+
     }
 
     public RuleCondition(RuleCondition other){

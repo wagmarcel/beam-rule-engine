@@ -15,7 +15,7 @@ import org.oisp.rules.ConditionOperators;
 import java.io.Serializable;
 import java.util.*;
 
-public class PersistRuleState extends DoFn<KV<String,RuleAndRuleCondition>, KV<String, Rule>> {
+public class PersistBasicRuleState extends DoFn<KV<String,RuleAndRuleCondition>, KV<String, Rule>> {
 
     class RuleConditionHash implements Serializable {
         Map<Integer, RuleCondition> rarch;
