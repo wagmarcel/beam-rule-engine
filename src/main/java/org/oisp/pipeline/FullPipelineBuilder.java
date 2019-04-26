@@ -67,12 +67,10 @@ public class FullPipelineBuilder {
                 .apply(ParDo.of(new GetComponentRulesTask(conf)));
         rwo
                 .apply(ParDo.of(new CheckBasicRule()))
-
-
-                .apply(ParDo.of(new PersistBasicRuleState()))
-                .apply(Window.<KV<String,Rule>>into(FixedWindows.of(Duration.standardSeconds(1))))
-                .apply(Combine.perKey(new MonitorRule()));
-                //.setCoder(KvCoder.of(StringUtf8Coder.of(), SerializableCoder.of(Rule.class)));
+                .apply(Window.<KV<String,RuleAndRuleCondition>>into(FixedWindows.of(Duration.standardSeconds(1))))
+                .apply(Combine.perKey(new ReduceBasicRule()))
+                .apply(ParDo.of(new PersistBasicRuleState()));
+        //.setCoder(KvCoder.of(StringUtf8Coder.of(), SerializableCoder.of(Rule.class)));
         //rwo.apply(ParDo.of(new CheckTimeBasedRule()));
         rwo.apply(ParDo.of(new PersistObservationTask(conf)))
                 .apply(ParDo.of(new CheckObservationInRulesTask(conf)))
