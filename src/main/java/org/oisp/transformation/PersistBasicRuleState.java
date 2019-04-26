@@ -15,37 +15,37 @@ import org.oisp.rules.ConditionOperators;
 import java.io.Serializable;
 import java.util.*;
 
-public class PersistBasicRuleState extends DoFn<KV<String,Rule>, KV<String, Rule>> {
+public class PersistBasicRuleState extends DoFn<KV<String,RuleAndRuleCondition>, KV<String, Rule>> {
 
-    @StateId("ruleState")
-    private final StateSpec<ValueState<Rule>> ruleState = StateSpecs.value();
+    class RuleConditionHash implements Serializable {
+        Map<Integer, RuleCondition> rarch;
+        RuleConditionHash() {
+            rarch = new HashMap<Integer, RuleCondition>();
+        }
+    }
+    @StateId("ruleCondHash")
+    private final StateSpec<ValueState<RuleConditionHash>> ruleCondHash = StateSpecs.value();
 
     @ProcessElement
     public void processElement(ProcessContext c,
-                               @StateId("ruleState") ValueState<Rule> ruleState) {
+                               @StateId("ruleCondHash") ValueState<RuleConditionHash> ruleCondHash) {
 
         //Record all ruleconditions per Rule
-        Rule rule = c.element().getValue();
-        if (rule == null || rule.getId() == null) {
-            return;
+        RuleAndRuleCondition rarc = c.element().getValue();
+        Rule rule = rarc.getRule();
+        RuleConditionHash rch = ruleCondHash.read();
+        if (rch == null) {
+            ruleCondHash.write(new RuleConditionHash());
+            rch = ruleCondHash.read();
         }
-        Rule rst = ruleState.read();
-        if (rst == null) {
-            ruleState.write(new Rule());
-            rst = ruleState.read();
-        }
+        rch.rarch.put(rarc.getIndex(), rarc.getRc());
 
         //send out all RuleConditions
-        for (int i = 0; i < rule.getConditions().size(); i++) {
-            RuleCondition rc = rule.getConditions().get(i);
-
-            if (rc.getFulfilled()) {
-                rst.getConditions().set(i, rc);
-            }
+        Rule mutableRule = new Rule(rule);
+        for (Map.Entry<Integer, RuleCondition> entry: rch.rarch.entrySet()) {
+            Integer index = entry.getKey();
+            mutableRule.getConditions().set(index, entry.getValue());
         }
-        ruleState.write(rst);
-
-        Rule mutableRule = new Rule(rst);
         c.output(KV.of(mutableRule.getId(), mutableRule));
     }
 }
