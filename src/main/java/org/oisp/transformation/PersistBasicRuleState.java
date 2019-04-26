@@ -1,51 +1,42 @@
 package org.oisp.transformation;
 
-import org.apache.beam.sdk.state.MapState;
 import org.apache.beam.sdk.state.StateSpec;
 import org.apache.beam.sdk.state.StateSpecs;
 import org.apache.beam.sdk.state.ValueState;
-import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.Rule;
-import org.oisp.collection.RuleAndRuleCondition;
+import org.oisp.collection.RuleWithRuleConditions;
 import org.oisp.collection.RuleCondition;
-import org.oisp.rules.ConditionOperators;
 
 import java.io.Serializable;
 import java.util.*;
 
-public class PersistBasicRuleState extends DoFn<KV<String,RuleAndRuleCondition>, KV<String, Rule>> {
+public class PersistBasicRuleState extends DoFn<KV<String,RuleWithRuleConditions>, KV<String, RuleWithRuleConditions>> {
 
-    class RuleConditionHash implements Serializable {
-        Map<Integer, RuleCondition> rarch;
-        RuleConditionHash() {
-            rarch = new HashMap<Integer, RuleCondition>();
-        }
-    }
+
     @StateId("ruleCondHash")
-    private final StateSpec<ValueState<RuleConditionHash>> ruleCondHash = StateSpecs.value();
+    private final StateSpec<ValueState<RuleWithRuleConditions>> state = StateSpecs.value();
 
     @ProcessElement
     public void processElement(ProcessContext c,
-                               @StateId("ruleCondHash") ValueState<RuleConditionHash> ruleCondHash) {
+                               @StateId("ruleCondHash") ValueState<RuleWithRuleConditions> state) {
 
         //Record all ruleconditions per Rule
-        RuleAndRuleCondition rarc = c.element().getValue();
+        RuleWithRuleConditions rarc = c.element().getValue();
         Rule rule = rarc.getRule();
-        RuleConditionHash rch = ruleCondHash.read();
+        RuleWithRuleConditions rch = state.read();
         if (rch == null) {
-            ruleCondHash.write(new RuleConditionHash());
-            rch = ruleCondHash.read();
+            state.write(new RuleWithRuleConditions(rarc));
+            rch = state.read();
         }
-        rch.rarch.put(rarc.getIndex(), rarc.getRc());
-
-        //send out all RuleConditions
-        Rule mutableRule = new Rule(rule);
-        for (Map.Entry<Integer, RuleCondition> entry: rch.rarch.entrySet()) {
+        //update all RuleConditions
+        for (Map.Entry<Integer, RuleCondition> entry : rarc.getRcHash().entrySet()) {
             Integer index = entry.getKey();
-            mutableRule.getConditions().set(index, entry.getValue());
+            rch.getRcHash().put(index, entry.getValue());
         }
-        c.output(KV.of(mutableRule.getId(), mutableRule));
+        //send out all RuleConditions
+        state.write(rch);
+        c.output(KV.of(rule.getId(), rarc));
     }
 }

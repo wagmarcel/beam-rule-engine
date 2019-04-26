@@ -1,21 +1,13 @@
 package org.oisp.transformation;
 
 import org.apache.beam.sdk.transforms.Combine;
-import org.oisp.collection.Observation;
 import org.oisp.collection.Rule;
-import org.oisp.collection.RuleAndRuleCondition;
-import org.oisp.collection.RuleCondition;
-import org.oisp.rules.ConditionOperators;
+import org.oisp.collection.RuleWithRuleConditions;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
-import static org.oisp.collection.Rule.FulfillmentState.FALSE;
-import static org.oisp.collection.Rule.FulfillmentState.TRUE;
-
-public class MonitorTimeBasedRule extends Combine.CombineFn<RuleAndRuleCondition, MonitorTimeBasedRule.Accum, RuleAndRuleCondition> {
+public class MonitorTimeBasedRule extends Combine.CombineFn<RuleWithRuleConditions, MonitorTimeBasedRule.Accum, RuleWithRuleConditions> {
 
 
     class Accum {
@@ -29,7 +21,7 @@ public class MonitorTimeBasedRule extends Combine.CombineFn<RuleAndRuleCondition
     }
 
     @Override
-    public Accum addInput(Accum accum, RuleAndRuleCondition input) {
+    public Accum addInput(Accum accum, RuleWithRuleConditions input) {
         // When accum does not have a rule ID, take over whole rule
 
         return accum;
@@ -43,7 +35,7 @@ public class MonitorTimeBasedRule extends Combine.CombineFn<RuleAndRuleCondition
     }
 
     @Override
-    public RuleAndRuleCondition extractOutput(Accum accum) {
+    public RuleWithRuleConditions extractOutput(Accum accum) {
         return null;
     }
 }

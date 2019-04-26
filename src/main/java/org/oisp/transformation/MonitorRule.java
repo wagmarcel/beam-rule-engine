@@ -1,79 +1,55 @@
 package org.oisp.transformation;
 
-import org.apache.beam.sdk.transforms.Combine;
+
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.Rule;
 import org.oisp.collection.RuleCondition;
+import org.oisp.collection.RuleWithRuleConditions;
 import org.oisp.rules.ConditionOperators;
-import org.oisp.utils.LogHelper;
-import org.slf4j.Logger;
 
-public class MonitorRule extends Combine.CombineFn<Rule, Rule, Rule> {
-    @Override
-    public Rule createAccumulator() {
-        return new Rule();
-    }
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-    @Override
-    public Rule addInput(Rule accumulator, Rule input) {
-        if (input == null) {
-            return accumulator;
-        }
-        if (accumulator.getId() == null) {
-            accumulator = input;
-        } else {
-            for (int i = 0; i < accumulator.getConditions().size(); i++) {
-                if (input.getConditions().get(i).getFulfilled()) {
-                    accumulator.getConditions().get(i).setFulfilled(true);
+
+public class MonitorRule extends DoFn<KV<String,RuleWithRuleConditions>, Rule> {
+
+
+    @ProcessElement
+    public void processElement(ProcessContext c) {
+        RuleWithRuleConditions rwrc = c.element().getValue();
+        //check whether rule is fulfilled
+        //if fulfilled, forward it to the Alert module
+        Rule mutableRule = new Rule(rwrc.getRule());
+        mutableRule.setConditions(new ArrayList<RuleCondition>());
+        Map<Integer, RuleCondition> ruleConditionMap = rwrc.getRcHash();
+        if (mutableRule.getConditionOperator() == ConditionOperators.AND) {
+            Boolean result = true;
+            for (int i = 0; i< mutableRule.getConditions().size(); i++) {
+                List<RuleCondition> rcl = mutableRule.getConditions();
+                if (rcl != null && rcl.get(i) != null && rcl.get(i).getFulfilled()) {
+                    mutableRule.getConditions().set(i, rcl.get(i));
+                } else {
+                    result = false;
                 }
             }
-        }
-        return accumulator;
-    }
-
-    @Override
-    public Rule mergeAccumulators(Iterable<Rule> accumulators) {
-        Rule merged = createAccumulator();
-        for (Rule accum : accumulators) {
-            if (accum == null || accum.getId() == null) {
-                continue;
-            }
-            if (merged.getId() == null) {
-                merged = accum;
-            } else {
-                for (int i = 0; i < merged.getConditions().size(); i++) {
-                    if (accum.getConditions().get(i).getFulfilled()) {
-                        merged.getConditions().get(i).setFulfilled(true);
-                    }
-                }
+            if (result) {
+                c.output(mutableRule);
             }
         }
-        return merged;
-    }
-
-    @Override
-    public Rule extractOutput(Rule accumulator) {
-        if (accumulator != null) {
-            if (accumulator.getConditionOperator() == ConditionOperators.AND) {
-                Boolean result = true;
-                for (RuleCondition rc: accumulator.getConditions()) {
-                    result &= rc.getFulfilled();
+        else {
+            Boolean result = false;
+            for (Map.Entry<Integer, RuleCondition> entry : ruleConditionMap.entrySet()) {
+                if (entry.getValue().getFulfilled()) {
+                    result |= true;
+                    mutableRule.getConditions().set(entry.getKey(), entry.getValue());
                 }
-                if (result) {
-                    System.out.println("Marcel372: Rule.And triggered: " + accumulator.getId());
-                    return accumulator;
-                }
-            } else {
-                Boolean result = false;
-                for (RuleCondition rc: accumulator.getConditions()) {
-                    result |= rc.getFulfilled();
-                }
-                if (result) {
-                    System.out.println("Marcel982: Rule.Or triggered: " + accumulator.getId());
-                    return accumulator;
-                }
-
+            }
+            if (result) {
+                c.output(mutableRule);
             }
         }
-        return null;
     }
 }

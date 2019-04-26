@@ -5,15 +5,12 @@ import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.*;
 import org.oisp.rules.conditions.BasicConditionChecker;
 import org.oisp.utils.LogHelper;
-import org.oisp.collection.RuleAndRuleCondition;
+import org.oisp.collection.RuleWithRuleConditions;
 import org.slf4j.Logger;
 
 import java.util.List;
 
-import static org.oisp.collection.Rule.FulfillmentState.FALSE;
-import static org.oisp.collection.Rule.FulfillmentState.TRUE;
-
-public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleAndRuleCondition>> {
+public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
 
     private List<RulesWithObservation> observationRulesList;
     private List<RuleCondition> fullFilledRuleConditions;
@@ -42,7 +39,7 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
                         }
                         RuleCondition mutableRc = new RuleCondition(rc);
                         mutableRc.setFulfilled(condFulfillment);
-                        c.output(KV.of(mutableRc.getRuleId(), new RuleAndRuleCondition(rule, mutableRc, i)));
+                        c.output(KV.of(mutableRc.getRuleId(), new RuleWithRuleConditions(rule, mutableRc, i)));
                     }
                 }
             }

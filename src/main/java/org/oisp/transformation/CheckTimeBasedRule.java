@@ -1,23 +1,16 @@
 package org.oisp.transformation;
 
-import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.*;
-import org.oisp.rules.ConditionOperators;
 import org.oisp.rules.conditions.ConditionFunctionChecker;
 import org.oisp.utils.LogHelper;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
-import static org.oisp.collection.Rule.FulfillmentState.FALSE;
-import static org.oisp.collection.Rule.FulfillmentState.TRUE;
-import static org.oisp.collection.Rule.FulfillmentState.UNDECIDED;
-
-public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<String, RuleAndRuleCondition>> {
+public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
     private List<RulesWithObservation> observationRulesList;
     private List<RuleCondition> fullFilledRuleConditions;
     private static final Logger LOG = LogHelper.getLogger(CheckBasicRule.class);
@@ -46,7 +39,7 @@ public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<Stri
                         }
                         RuleCondition mutableRuleCondition = new RuleCondition(rc);
                         mutableRuleCondition.setObservation(observation);
-                        RuleAndRuleCondition rarc = new RuleAndRuleCondition(rule, mutableRuleCondition, i);
+                        RuleWithRuleConditions rarc = new RuleWithRuleConditions(rule, mutableRuleCondition, i);
                         c.output(KV.of(rule.getId(), rarc));
                     }
                 }
