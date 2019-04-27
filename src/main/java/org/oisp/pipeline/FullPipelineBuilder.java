@@ -7,13 +7,12 @@ import org.apache.beam.sdk.io.GenerateSequence;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.kafka.KafkaRecord;
 import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.transforms.Combine;
 import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.windowing.FixedWindows;
-import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.PCollectionList;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import org.joda.time.Duration;
@@ -65,14 +64,21 @@ public class FullPipelineBuilder {
         PCollection<List<RulesWithObservation>> rwo = p.apply(observationsKafka.getTransform())
                 .apply(ParDo.of(new KafkaToObservationFn()))
                 .apply(ParDo.of(new GetComponentRulesTask(conf)));
-        rwo
-                .apply(ParDo.of(new CheckBasicRule()))
+        PCollection<KV<String,RuleWithRuleConditions>> basicRulePipeline =
+                rwo
+                        .apply(ParDo.of(new CheckBasicRule()));
 
-
-                .apply(ParDo.of(new PersistBasicRuleState()))
-                .apply(ParDo.of(new MonitorRule()));
                 //.setCoder(KvCoder.of(StringUtf8Coder.of(), SerializableCoder.of(Rule.class)));
-        //rwo.apply(ParDo.of(new CheckTimeBasedRule()));
+        PCollection<KV<String, RuleWithRuleConditions>> timeBasedRulePipeline =
+                rwo
+                        .apply(ParDo.of(new CheckTimeBasedRule()))
+                        .apply(ParDo.of(new PersistTimeBasedRuleState()));
+        PCollectionList<KV<String, RuleWithRuleConditions>> ruleColl = PCollectionList.of(basicRulePipeline).and(timeBasedRulePipeline);
+        ruleColl
+                .apply(Flatten.<KV<String, RuleWithRuleConditions>>pCollections())
+                .apply(ParDo.of(new PersistBasicRuleState()))
+                .apply(ParDo.of(new CheckRuleFulfillment()));
+
         rwo.apply(ParDo.of(new PersistObservationTask(conf)))
                 .apply(ParDo.of(new CheckObservationInRulesTask(conf)))
                 .apply(ParDo.of(new PersistComponentAlertsTask(conf)))

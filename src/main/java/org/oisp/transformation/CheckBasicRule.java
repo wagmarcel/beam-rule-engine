@@ -9,6 +9,7 @@ import org.oisp.collection.RuleWithRuleConditions;
 import org.slf4j.Logger;
 
 import java.util.List;
+import java.util.TreeMap;
 
 public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
 
@@ -25,6 +26,7 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
         for (RulesWithObservation rwo : observationRulesList) {
             for (Rule rule: rwo.getRules()) {
                 Observation observation = rwo.getObservation();
+                RuleWithRuleConditions mutableRWRC = new RuleWithRuleConditions(rule);
                 for (int i=0; i < rule.getConditions().size(); i++) {
                     RuleCondition rc = rule.getConditions().get(i);
                     Boolean condFulfillment;
@@ -37,11 +39,14 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
                         } else {
                             condFulfillment = false;
                         }
-                        RuleCondition mutableRc = new RuleCondition(rc);
-                        mutableRc.setFulfilled(condFulfillment);
-                        c.output(KV.of(mutableRc.getRuleId(), new RuleWithRuleConditions(rule, mutableRc, i)));
+                        RuleCondition mutableRuleCondition = new RuleCondition(rc);
+                        mutableRuleCondition.setFulfilled(condFulfillment);
+                        mutableRuleCondition.setObservation(observation);
+                        mutableRWRC.addRC(i, mutableRuleCondition);
                     }
                 }
+                c.output(KV.of(mutableRWRC.getRule().getId(), mutableRWRC));
+
             }
         }
     }

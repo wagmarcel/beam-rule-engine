@@ -73,6 +73,12 @@ public class RuleCondition implements Serializable {
         observation = other.observation;
     }
 
+    public RuleCondition clone(RuleCondition other){
+        RuleCondition rc = new RuleCondition(other);
+        rc.setTimeBasedState(other.getTimeBasedState());
+        return rc;
+    }
+
     public void setTimeLimit(Long timeLimit) {
         this.timeLimit = timeLimit;
     }

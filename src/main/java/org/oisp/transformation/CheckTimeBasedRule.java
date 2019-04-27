@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
     private List<RulesWithObservation> observationRulesList;
@@ -21,9 +23,9 @@ public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<Stri
     }
 
     void sendFulfillmentState(ProcessContext c) {
-        List<Rule> mutableRuleList = new ArrayList<>();
         for (RulesWithObservation rwo : observationRulesList) {
             for (Rule rule: rwo.getRules()) {
+                RuleWithRuleConditions  mutableRWRC = new RuleWithRuleConditions(rule);
                 Observation observation = rwo.getObservation();
                 for (int i = 0; i< rule.getConditions().size();i++) {
                     RuleCondition rc = rule.getConditions().get(i);
@@ -39,12 +41,16 @@ public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<Stri
                         }
                         RuleCondition mutableRuleCondition = new RuleCondition(rc);
                         mutableRuleCondition.setObservation(observation);
-                        RuleWithRuleConditions rarc = new RuleWithRuleConditions(rule, mutableRuleCondition, i);
-                        c.output(KV.of(rule.getId(), rarc));
+                        mutableRuleCondition.setTimeBasedState(new TreeMap<Long, Boolean>());
+                        mutableRuleCondition.getTimeBasedState().put(observation.getOn(), result);
+                        mutableRWRC.addRC(i, mutableRuleCondition);
+
                     }
+                }
+                if (mutableRWRC.getRcHash().size() != 0) {
+                    c.output(KV.of(rule.getId(), mutableRWRC));
                 }
             }
         }
     }
-
 }

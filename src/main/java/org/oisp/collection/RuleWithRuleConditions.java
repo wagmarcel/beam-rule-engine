@@ -12,16 +12,15 @@ import java.util.TreeMap;
 public class RuleWithRuleConditions implements Serializable {
 
     private final Rule rule;
-    private final SortedMap<Integer, RuleCondition> rcHash;
+    private SortedMap<Integer, RuleCondition> rcHash;
 
     public RuleWithRuleConditions(){
         rule = null;
         rcHash = new TreeMap<Integer, RuleCondition>();
     }
-    public RuleWithRuleConditions(Rule rule, RuleCondition rc, int index) {
+    public RuleWithRuleConditions(Rule rule) {
         this.rule = rule;
         rcHash = new TreeMap<Integer, RuleCondition>();
-        rcHash.put(index, rc);
     }
 
     public RuleWithRuleConditions(RuleWithRuleConditions other){
@@ -29,8 +28,15 @@ public class RuleWithRuleConditions implements Serializable {
         rcHash = new TreeMap<Integer, RuleCondition>(other.rcHash);
     }
 
-    public Map<Integer, RuleCondition> getRcHash() {
+    public void addRC(Integer index, RuleCondition rc) {
+        rcHash.put(index, rc);
+    }
+    public SortedMap<Integer, RuleCondition> getRcHash() {
         return rcHash;
+    }
+
+    public void setRcHash(SortedMap<Integer, RuleCondition> rcHash) {
+        this.rcHash = rcHash;
     }
 
     public Rule getRule() {
