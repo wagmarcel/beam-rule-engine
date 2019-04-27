@@ -68,10 +68,10 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
         Boolean removeSubTree = false;
         Long latestTS = rc.getTimeBasedState().lastKey();
         Long latestInSubTree = timeBasedSubtree.lastKey();
-        if (latestTS - latestInSubTree > 60) {
+        if (latestTS - latestInSubTree > 60 * 1000) {
             removeSubTree = true;
         }
-        if (timeBasedSubtree.size() < 3) {
+        if (timeBasedSubtree.size() < 2) {
             if (removeSubTree) {
                 timeBasedSubtree.clear();
             }
@@ -88,7 +88,7 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
                 lastTS = entry.getKey();
             }
         }
-        if (lastTS - firstTS >= rc.getTimeLimit()) {
+        if (lastTS - firstTS >= rc.getTimeLimit() * 1000) {
             if (removeSubTree) {
                 timeBasedSubtree.clear();
             }
@@ -120,14 +120,9 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
             }
             //at this point we either have a nextTS!=firstTS which is unfulfilled or nextTS==firstTS
             if (nextTS != firstTS) {
-
-                if (nextTS - firstTS < rc.getTimeLimit()) {
-                    //Max possible limit is smaller than timeLimit so discard the content
-                    //Except the nextTS which will become the firstTS
-                    timeBasedState.headMap(nextTS - 1).clear();
-                } else {
-                    Boolean result = checkFulfillment(rc, timeBasedState.subMap(firstTS, nextTS));
-                }
+                //TODO: We currently are assuming that all observations arrive in order
+                //Out of order processing should be considered but it might change
+                timeBasedState.headMap(nextTS - 1).clear();
                 firstTS = nextTS;
             } else {
                 done = true;
