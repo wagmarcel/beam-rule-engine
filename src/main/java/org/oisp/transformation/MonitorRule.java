@@ -12,6 +12,7 @@ import org.oisp.rules.ConditionOperators;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 
 public class MonitorRule extends DoFn<KV<String,RuleWithRuleConditions>, Rule> {
@@ -41,13 +42,14 @@ public class MonitorRule extends DoFn<KV<String,RuleWithRuleConditions>, Rule> {
         }
         else {
             Boolean result = false;
-            for (Map.Entry<Integer, RuleCondition> entry : ruleConditionMap.entrySet()) {
+            for (SortedMap.Entry<Integer, RuleCondition> entry : ruleConditionMap.entrySet()) {
                 if (entry.getValue().getFulfilled()) {
                     result |= true;
-                    mutableRule.getConditions().set(entry.getKey(), entry.getValue());
+                    mutableRule.getConditions().add(entry.getValue());
                 }
             }
             if (result) {
+                System.out.printf("Rule %s triggered\n", mutableRule.getId());
                 c.output(mutableRule);
             }
         }

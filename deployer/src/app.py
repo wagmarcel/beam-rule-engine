@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2018 Intel Corporation
+# Copyright (c) 2015-2019 Intel Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,61 +11,74 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Deploy spark application locally
 
-Application is a jar located at $RULE_ENGINE_PACKAGE_NAME,
-Spark must run locally, port number is read from $SPARK,
-which stores a whole URL.
-"""
+import json
 import os
+import pprint
+import requests
 import time
 
-import kafka
+import oisp
 
-from flink_api import FlinkApi
-import cloudfoundry_bridge
+from gearpump_api import GearpumpApi
 
-KAFKA_BROKER_TIMEOUT = 300
+def load_config_from_env(varname, seen_keys=None):
+    """Read OISP config, which is an extended JSON format
 
-def wait_for_frontend():
-    """Wait for OISP frontend hearbeat."""
-    kafka_server = os.environ["KAFKA"]
-    heartbeat_topic = os.environ["KAFKA_HEARTBEAT_TOPIC"]
-    
-    print("Waiting for frontend from server ", kafka_server, "on topic ", heartbeat_topic );
-    for _ in range(KAFKA_BROKER_TIMEOUT):
+    Values starting with @@ or %% are further ENV variables."""
+    if seen_keys is None:
+        seen_keys = []
+    conf = json.loads(os.environ[varname])
+    for key, value in conf.items():
         try:
-            consumer = kafka.KafkaConsumer(heartbeat_topic, bootstrap_servers=kafka_server,
-                                           auto_offset_reset='latest')
-        except kafka.errors.NoBrokersAvailable:
-            time.sleep(1)
-
-    for message in consumer:
-        # Frontend heartbeat message is dashboard for historical reasons
-        if message.value == "dashboard":
-            print("Time, dashboard message ts:", time.time(), message.timestamp)
-            break
-
-    print("Frontend is up")
-
-
-def main():
-    """Deploy app to local flink instance."""
-    rule_engine_jar_name = os.environ['RULE_ENGINE_PACKAGE_NAME']
-
-    # Cloudfoundry needs frontend
-    wait_for_frontend()
-    cloud_bridge = cloudfoundry_bridge.CloudfoundryBridge()
-    config = cloud_bridge.build_config(local=True)
-
-    # We are only interested in port number because we deploy locally
-    #spark_port = os.environ["SPARK"].split(":")[1]
-    flink_api = FlinkApi(uri="flink-master:8081")
-    print("Submitting application '{}' into Flink ...".format(rule_engine_jar_name))
-    flink_api.submit_app(filename=rule_engine_jar_name,
-                            app_name=config['application_name'],
-                            flink_app_config=config, force=True)
+            if value[:2] in ['@@', '%%']:
+                assert key not in seen_keys, "Cyclic config"
+                seen_keys.append(key)
+                conf[key] = load_config_from_env(value[2:], seen_keys[:])
+        except TypeError: #value not indexable = not string or unicode
+            pass
+    return conf
 
 
 if __name__ == "__main__":
-    main()
+    print("Starting deployment script")
+    conf = load_config_from_env("OISP_RULEENGINE_CONFIG")
+    rule_engine_jar_name = os.environ["RULE_ENGINE_PACKAGE_NAME"]
+    uri = "http://{}/v1/api".format(conf["frontendUri"])
+    while True:
+        try:
+            oisp_client = oisp.Client(uri)
+            oisp_client.auth(conf["username"], conf["password"])
+            break
+        except (requests.exceptions.ConnectionError, oisp.client.OICException):
+            print("Can not connect to {}, retrying".format(uri))
+            time.sleep(1)
+
+    token = oisp_client.user_token.value
+    pprint.pprint(conf)
+
+    app_conf = {"application_name": "rule_engine_dashboard",
+                "dashboard_strict_ssl": False,
+                "dashboard_url": "http://{}".format(conf["frontendUri"]),
+                "kafka_servers": conf["kafkaConfig"]["uri"],
+                "kafka_zookeeper_quorum": conf["zookeeperConfig"]["zkCluster"],
+                "kafka_observations_topic": conf["kafkaConfig"]["topicsObservations"],
+                "kafka_rule_engine_topic": conf["kafkaConfig"]["topicsRuleEngine"],
+                "kafka_heartbeat_topic": conf["kafkaConfig"]["topicsHeartbeatName"],
+                "kafka_heartbeat_interval": conf["kafkaConfig"]["topicsHeartbeatInterval"],
+                "hadoop_security_authentication": conf["hbaseConfig"]["hadoopProperties"]["hadoop.securit\
+y.authentication"],
+                "hbase_table_prefix": "local",
+                "token": token,
+                "zookeeper_hbase_quorum": conf["zookeeperConfig"]["zkCluster"].split(":")[0]
+                }
+
+    # We are only interested in port number because we deploy locally
+    gearpump_port = conf["uri"].split(":")[1]
+    gearpump_api = GearpumpApi(uri="http://localhost:{}".format(gearpump_port),
+                               credentials={"username": conf["gearpumpUsername"],
+                                            "password": conf["gearpumpPassword"]})
+    print("Submitting application '{}' into gearpump ...".format(rule_engine_jar_name))
+    gearpump_api.submit_app(filename=rule_engine_jar_name,
+                            app_name=app_conf['application_name'],
+                            gearpump_app_config=app_conf, force=True)
