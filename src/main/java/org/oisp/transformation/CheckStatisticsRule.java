@@ -3,19 +3,16 @@ package org.oisp.transformation;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.*;
-import org.oisp.rules.conditions.BasicConditionChecker;
-import org.oisp.utils.LogHelper;
-import org.oisp.collection.RuleWithRuleConditions;
-import org.slf4j.Logger;
+import org.oisp.collection.subCollections.NormalizedStatisticsValues;
 
 import java.util.List;
-import java.util.TreeMap;
 
-public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
 
+//For statistics rules there is no real fulfillment check per component in contrast to Basic Rules and TB Rules
+//Nevertheless, this task is mainly to translate RuleObservations to RuleConditions
+public class CheckStatisticsRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
     private List<RulesWithObservation> observationRulesList;
-    private List<RuleCondition> fullFilledRuleConditions;
-    private static final Logger LOG = LogHelper.getLogger(CheckBasicRule.class);
+
     @ProcessElement
     public void processElement(ProcessContext c) {
         observationRulesList = c.element();
@@ -30,17 +27,15 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
                 for (int i=0; i < rule.getConditions().size(); i++) {
                     RuleCondition rc = rule.getConditions().get(i);
                     Boolean condFulfillment;
-                    if (rc.isTimebased() || rc.isStatistics()) {
+                    if (!rc.isStatistics()) {
                         continue;
                     }
                     if (rc.getComponentId().equals(observation.getCid())) {
-                        if (new BasicConditionChecker(rc).isConditionFulfilled(observation)) {
-                            condFulfillment = true;
-                        } else {
-                            condFulfillment = false;
-                        }
                         RuleCondition mutableRuleCondition = new RuleCondition(rc);
-                        mutableRuleCondition.setFulfilled(condFulfillment);
+                        Double sample = Double.valueOf(observation.getValue());
+                        NormalizedStatisticsValues nSV = new NormalizedStatisticsValues(sample,
+                                sample * sample, observation.getOn(), Double.valueOf(observation.getValue()));
+                        mutableRuleCondition.setStatisticsValues(nSV);
                         mutableRuleCondition.setObservation(observation);
                         mutableRWRC.addRC(i, mutableRuleCondition);
                     }
@@ -48,6 +43,7 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
                 if (!mutableRWRC.getRcHash().isEmpty()) {
                     c.output(KV.of(mutableRWRC.getRule().getId(), mutableRWRC));
                 }
+
             }
         }
     }

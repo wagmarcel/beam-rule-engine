@@ -39,7 +39,7 @@ public class ConditionFunctionChecker {
         this(ruleCondition.getOperator(), ruleCondition.getValues(), ruleCondition.getComponentDataType());
     }
 
-    ConditionFunctionChecker(Operators operator, List<String> values, DataType componentDataType) {
+    public ConditionFunctionChecker(Operators operator, List<String> values, DataType componentDataType) {
         this.operator = operator;
         this.values = values;
         this.componentDataType = componentDataType;

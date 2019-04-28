@@ -44,10 +44,9 @@ public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<Stri
                         mutableRuleCondition.setTimeBasedState(new TreeMap<Long, Boolean>());
                         mutableRuleCondition.getTimeBasedState().put(observation.getOn(), result);
                         mutableRWRC.addRC(i, mutableRuleCondition);
-
                     }
                 }
-                if (mutableRWRC.getRcHash().size() != 0) {
+                if (!mutableRWRC.getRcHash().isEmpty()) {
                     c.output(KV.of(rule.getId(), mutableRWRC));
                 }
             }

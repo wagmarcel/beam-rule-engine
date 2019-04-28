@@ -44,7 +44,7 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
         for (SortedMap.Entry<Integer, RuleCondition> entry : rch.entrySet()) {
             //get state RC lists and merge it
             if (state.get(entry.getKey()) == null) {
-                state.put(entry.getKey(), entry.getValue().clone(entry.getValue()));
+                state.put(entry.getKey(), entry.getValue().clone());
             } else {
                 state.get(entry.getKey()).getTimeBasedState().putAll(entry.getValue().getTimeBasedState());
             }

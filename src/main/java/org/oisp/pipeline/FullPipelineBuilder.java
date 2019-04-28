@@ -73,7 +73,12 @@ public class FullPipelineBuilder {
                 rwo
                         .apply(ParDo.of(new CheckTimeBasedRule()))
                         .apply(ParDo.of(new PersistTimeBasedRuleState()));
-        PCollectionList<KV<String, RuleWithRuleConditions>> ruleColl = PCollectionList.of(basicRulePipeline).and(timeBasedRulePipeline);
+
+        PCollection<KV<String, RuleWithRuleConditions>> statisticsRulePipeline =
+                rwo
+                        .apply(ParDo.of(new CheckStatisticsRule()))
+                        .apply(ParDo.of(new PersistStatisticsRule()));
+        PCollectionList<KV<String, RuleWithRuleConditions>> ruleColl = PCollectionList.of(basicRulePipeline).and(timeBasedRulePipeline).and(statisticsRulePipeline);
         ruleColl
                 .apply(Flatten.<KV<String, RuleWithRuleConditions>>pCollections())
                 .apply(ParDo.of(new PersistBasicRuleState()))

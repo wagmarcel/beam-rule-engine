@@ -1,52 +1,32 @@
-/*
- * Copyright (c) 2016 Intel Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+package org.oisp.rules;
 
-package org.oisp.rules.conditions;
-
-import org.oisp.data.StatisticsRepository;
-import org.oisp.data.alerts.ScanProperties;
-import org.oisp.data.statistics.StatisticsValues;
 import org.oisp.collection.Observation;
 import org.oisp.collection.RuleCondition;
-//import org.oisp.util.LogHelper;
-import org.slf4j.Logger;
+import org.oisp.collection.subCollections.NormalizedStatisticsValues;
+import org.oisp.rules.conditions.BaseConditionChecker;
+import org.oisp.rules.conditions.ConditionChecker;
+import org.oisp.rules.conditions.ConditionFunctionChecker;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class    StatisticsConditionChecker extends BaseConditionChecker implements ConditionChecker {
-
+public class StatisticsRuleConditionChecker extends BaseConditionChecker implements ConditionChecker {
     private double average;
     private double standardDeviation;
     private List<String> conditionValues;
-    private final StatisticsRepository statisticsRepository;
-    private Observation observation;
+    private final NormalizedStatisticsValues values;
+    //private Observation observation;
     //private static final Logger logger = LogHelper.getLogger(StatisticsConditionChecker.class);
 
-    public StatisticsConditionChecker(RuleCondition ruleCondition, StatisticsRepository statisticsRepository) {
+    public StatisticsRuleConditionChecker(RuleCondition ruleCondition, NormalizedStatisticsValues values) {
         super(ruleCondition);
-        this.statisticsRepository = statisticsRepository;
+        this.values = values;
     }
 
     @Override
     public boolean isConditionFulfilled(Observation observation) {
-        this.observation = observation;
+        //this.observation = observation;
         try {
             if (!hasRequiredObservationCount()) {
                 return false;
@@ -63,29 +43,13 @@ public class    StatisticsConditionChecker extends BaseConditionChecker implemen
     }
 
     private boolean hasRequiredObservationCount() throws IOException {
-        double count = statisticsRepository.getObservationCount(createScanProperties());
+        double count = values.getNumSamples();
         return Double.compare(count, getRuleCondition().getMinimalObservationCountInTimeWindow()) >= 0;
     }
 
     private void calculateStatistics() throws IOException {
-        StatisticsValues statisticsValues = statisticsRepository.getStatisticsValuesForObservation(createScanProperties());
-        average = statisticsValues.getAverage();
-        standardDeviation = statisticsValues.getStandardDeviation();
-    }
-
-    private ScanProperties createScanProperties() {
-        return new ScanProperties()
-                .withComponentId(observation.getCid())
-                .withStart(getTimeWindowStart())
-                .withStop(getTimeWindowEnd());
-    }
-
-    private long getTimeWindowStart() {
-        return observation.getOn() - getTimeWindowLength();
-    }
-
-    private long getTimeWindowEnd() {
-        return observation.getOn();
+        average = values.getAverage();
+        standardDeviation = values.getStdDev();
     }
 
     private void buildConditionValues() {

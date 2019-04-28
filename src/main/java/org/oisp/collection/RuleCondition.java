@@ -19,6 +19,7 @@ package org.oisp.collection;
 
 import com.google.common.base.Objects;
 import org.oisp.apiclients.rules.model.ConditionValue;
+import org.oisp.collection.subCollections.NormalizedStatisticsValues;
 import org.oisp.rules.ConditionType;
 import org.oisp.rules.DataType;
 import org.oisp.rules.Operators;
@@ -30,6 +31,7 @@ import java.util.SortedMap;
 
 public class RuleCondition implements Serializable {
 
+
     private List<String> values;
     private Operators operator;
     private ConditionType type;
@@ -40,12 +42,25 @@ public class RuleCondition implements Serializable {
     /**
      * timeLimit for timebased and statistics conditions (in seconds)
      */
-
     private Long timeLimit;
     private String ruleId;
+    // For Statistics rule: only trigger when enough samples are found
     private Long minimalObservationCountInTimeWindow;
-    private Observation observation; // Observation which triggered fulfillment of the condition
-    private SortedMap<Long, Boolean> timeBasedState; //contains the timeBased max found timemstamp difference of fulfilling elements
+    // Observation which triggered fulfillment of the condition
+    private Observation observation;
+    // ONLY for TB Rules: contains the timeBased max found timemstamp
+    // difference of fulfilling elements
+    private SortedMap<Long, Boolean> timeBasedState;
+    //ONLY for Statistics Rule: Values to decide when to trigger
+    private NormalizedStatisticsValues statisticsValues;
+
+    public NormalizedStatisticsValues getStatisticsValues() {
+        return statisticsValues;
+    }
+
+    public void setStatisticsValues(NormalizedStatisticsValues statisticsValues) {
+        this.statisticsValues = statisticsValues;
+    }
 
     public SortedMap<Long, Boolean> getTimeBasedState() {
         return timeBasedState;
@@ -73,9 +88,14 @@ public class RuleCondition implements Serializable {
         observation = other.observation;
     }
 
-    public RuleCondition clone(RuleCondition other){
-        RuleCondition rc = new RuleCondition(other);
-        rc.setTimeBasedState(other.getTimeBasedState());
+    public RuleCondition clone(){
+        RuleCondition rc = new RuleCondition(this);
+        if (getTimeBasedState() != null) {
+            rc.setTimeBasedState(getTimeBasedState());
+        }
+        if (statisticsValues != null) {
+            rc.setStatisticsValues(new NormalizedStatisticsValues(getStatisticsValues()));
+        }
         return rc;
     }
 
@@ -98,6 +118,7 @@ public class RuleCondition implements Serializable {
     public void setFulfilled(Boolean fulfilled) {
         this.fulfilled = fulfilled;
     }
+
     public Long getMinimalObservationCountInTimeWindow() {
         return minimalObservationCountInTimeWindow;
     }
