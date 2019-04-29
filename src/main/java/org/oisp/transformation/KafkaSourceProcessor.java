@@ -17,7 +17,6 @@
 
 package org.oisp.transformation;
 
-import kafka.api.OffsetRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.kafka.KafkaIO.Read;
@@ -25,7 +24,6 @@ import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.oisp.conf.Config;
 import org.oisp.conf.ConfigFactory;
-import java.util.List;
 
 
 public class KafkaSourceProcessor {
@@ -37,9 +35,9 @@ public class KafkaSourceProcessor {
 
     private KafkaIO.Read<String, byte[]> transform = null;
 
-    public KafkaIO.Read<String,byte[]> getTransform(){
+    public KafkaIO.Read<String, byte[]> getTransform() {
         return transform;
-    };
+    }
 
     public KafkaSourceProcessor(Config userConfig, String topic) {
 

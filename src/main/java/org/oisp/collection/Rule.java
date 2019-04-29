@@ -38,9 +38,11 @@ public class Rule implements Serializable {
 
     private List<RuleCondition> conditions;
 
-    public Rule(){}
-    public Rule(Rule other){
-        id = (other.id != null)?new String(other.id):null;
+    public Rule() {
+    }
+
+    public Rule(Rule other) {
+        id = (other.id != null) ? new String(other.id) : null;
         accountId = other.accountId;
         fulfilled = other.fulfilled;
         conditionOperator = other.conditionOperator;

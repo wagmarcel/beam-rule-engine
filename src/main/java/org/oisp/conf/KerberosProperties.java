@@ -17,9 +17,6 @@
 
 package org.oisp.conf;
 
-import org.oisp.conf.Config;
-//import io.gearpump.cluster.UserConfig;
-
 public final class KerberosProperties {
 
 
@@ -44,14 +41,18 @@ public final class KerberosProperties {
 
     public static KerberosProperties fromConfig(Config config) {
         KerberosProperties kerberosProperties = new KerberosProperties();
-        kerberosProperties.enabled = (config.get(Config.hbase.KERBEROS_AUTHENTICATION) != null) && config.get(Config.hbase.KERBEROS_AUTHENTICATION).equals(config.get(Config.hbase.AUTHENTICATION_METHOD));
-        if (!kerberosProperties.enabled) return kerberosProperties;
-        kerberosProperties.kdc = config.get(Config.kbr.KRB_KDC).toString();
-        kerberosProperties.realm = config.get(Config.kbr.KRB_REALM).toString();
-        kerberosProperties.user = config.get(Config.kbr.KRB_USER).toString();
-        kerberosProperties.password = config.get(Config.kbr.KRB_PASS).toString();
-        kerberosProperties.masterPrincipal = config.get(Config.kbr.KRB_MASTER_PRINCIPAL).toString();
-        kerberosProperties.regionServerPrinicipal = config.get(Config.kbr.KRB_REGIONSERVER_PRINCIPAL).toString();
+        kerberosProperties.enabled = (config.get(Config.getHbase().KERBEROS_AUTHENTICATION) != null)
+                && config.get(Config.getHbase().KERBEROS_AUTHENTICATION)
+                .equals(config.get(Config.getHbase().AUTHENTICATION_METHOD));
+        if (!kerberosProperties.enabled) {
+            return kerberosProperties;
+        }
+        kerberosProperties.kdc = config.get(Config.getKbr().KRB_KDC).toString();
+        kerberosProperties.realm = config.get(Config.getKbr().KRB_REALM).toString();
+        kerberosProperties.user = config.get(Config.getKbr().KRB_USER).toString();
+        kerberosProperties.password = config.get(Config.getKbr().KRB_PASS).toString();
+        kerberosProperties.masterPrincipal = config.get(Config.getKbr().KRB_MASTER_PRINCIPAL).toString();
+        kerberosProperties.regionServerPrinicipal = config.get(Config.getKbr().KRB_REGIONSERVER_PRINCIPAL).toString();
         return kerberosProperties;
     }
 

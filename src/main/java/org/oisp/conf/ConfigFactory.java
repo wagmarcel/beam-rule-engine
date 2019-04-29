@@ -1,12 +1,7 @@
 package org.oisp.conf;
 
 import com.google.gson.Gson;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.oisp.conf.Config;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Copyright (c) 2016 Intel Corporation
@@ -32,11 +27,11 @@ public class ConfigFactory {
     public Config getConfigFromArgs(String args) {
         Gson g = new Gson();
         try {
-            HashMap<String, Object> hash = getConfig().getHash();
+            Map<String, Object> hash = getConfig().getHash();
             hash = g.fromJson(args, hash.getClass());
 
             return getConfig().put(hash);
-        }catch ( IllegalStateException exception){
+        } catch (IllegalStateException exception) {
             return null;
         }
     }
@@ -44,7 +39,4 @@ public class ConfigFactory {
     public Config getConfig() {
         return new Config();
     }
-
-
-
 }

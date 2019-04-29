@@ -10,7 +10,7 @@ public class RuleWithRuleConditions implements Serializable {
     private final Rule rule;
     private SortedMap<Integer, RuleCondition> rcHash;
 
-    public RuleWithRuleConditions(){
+    public RuleWithRuleConditions() {
         rule = null;
         rcHash = new TreeMap<Integer, RuleCondition>();
     }
@@ -19,7 +19,7 @@ public class RuleWithRuleConditions implements Serializable {
         rcHash = new TreeMap<Integer, RuleCondition>();
     }
 
-    public RuleWithRuleConditions(RuleWithRuleConditions other){
+    public RuleWithRuleConditions(RuleWithRuleConditions other) {
         rule = other.rule;
         rcHash = new TreeMap<Integer, RuleCondition>(other.rcHash);
     }

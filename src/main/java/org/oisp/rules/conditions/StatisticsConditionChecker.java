@@ -22,11 +22,8 @@ import org.oisp.data.alerts.ScanProperties;
 import org.oisp.data.statistics.StatisticsValues;
 import org.oisp.collection.Observation;
 import org.oisp.collection.RuleCondition;
-//import org.oisp.util.LogHelper;
-import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

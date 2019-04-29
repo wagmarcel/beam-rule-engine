@@ -41,9 +41,9 @@ public abstract class BaseRepository implements Serializable {
     private static Semaphore mutex = new Semaphore(1);
 
     public BaseRepository(Config userConfig) {
-        String tablePrefix = userConfig.get(Config.hbase.TABLE_PREFIX).toString();
+        String tablePrefix = userConfig.get(Config.getHbase().TABLE_PREFIX).toString();
         tableName = buildTableName(tablePrefix);
-        zkQuorum = userConfig.get(userConfig.hbase.ZOOKEEPER_QUORUM).toString();
+        zkQuorum = userConfig.get(Config.getHbase().ZOOKEEPER_QUORUM).toString();
         this.userConfig = userConfig;
     }
 
@@ -78,7 +78,7 @@ public abstract class BaseRepository implements Serializable {
 
     private Connection getHbaseConnection() throws IOException {
         if (hbaseConnection == null || hbaseConnection.isClosed()) {
-            hbaseConnection =  HbaseConnManager.newInstance(Config.kbr.fromConfig(userConfig), zkQuorum).create();
+            hbaseConnection =  HbaseConnManager.newInstance(Config.getKbr().fromConfig(userConfig), zkQuorum).create();
         }
         return hbaseConnection;
     }

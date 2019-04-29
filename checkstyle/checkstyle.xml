@@ -3,9 +3,11 @@
         "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
         "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="Checker">
+    <module name="SuppressWarningsFilter" />
     <module name="TreeWalker">
         <property name="fileExtensions" value="java"/>
 
+        <module name="SuppressWarningsHolder" />
         <module name="AnnotationLocation"/>
         <module name="AnonInnerLength"/>
         <module name="BooleanExpressionComplexity"/>
@@ -109,6 +111,7 @@
         <module name="ArrayTypeStyle"/>
         <module name="TodoComment"/>
         <module name="UpperEll"/>
+
     </module>
     <module name="SuppressionCommentFilter"/>
 </module>

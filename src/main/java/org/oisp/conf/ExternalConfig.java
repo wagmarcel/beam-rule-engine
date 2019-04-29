@@ -229,8 +229,8 @@ public class ExternalConfig {
 
 
         Config config = new Config()
-                .put(Config.hbase.ZOOKEEPER_QUORUM, getZookeeper_hbase_quorum())
-                .put(Config.hbase.TABLE_PREFIX, getHbase_table_prefix())
+                .put(Config.getHbase().ZOOKEEPER_QUORUM, getZookeeper_hbase_quorum())
+                .put(Config.getHbase().TABLE_PREFIX, getHbase_table_prefix())
                 .put(Config.DASHBOARD_TOKEN_PROPERTY, getToken())
                 .put(Config.DASHBOARD_URL_PROPERTY, getDashboard_url())
                 .put(Config.DASHBOARD_STRICT_SSL_VERIFICATION, getDashboard_strict_ssl())
@@ -240,13 +240,13 @@ public class ExternalConfig {
                 .put(Config.KAFKA_HEARTBEAT_INTERVAL_PROPERTY, getKafka_heartbeat_interval())
                 .put(Config.KAFKA_URI_PROPERTY, getKafka_servers())
                 .put(Config.KAFKA_ZOOKEEPER_PROPERTY, getKafka_zookeeper_quorum())
-                .put(Config.hbase.AUTHENTICATION_METHOD, getHadoop_security_authentication())
-                .put(Config.kbr.KRB_KDC, getKrb_kdc())
-                .put(Config.kbr.KRB_PASS, getKrb_password())
-                .put(Config.kbr.KRB_REALM, getKrb_realm())
-                .put(Config.kbr.KRB_USER, getKrb_user())
-                .put(Config.kbr.KRB_MASTER_PRINCIPAL, getKrb_master_principal())
-                .put(Config.kbr.KRB_REGIONSERVER_PRINCIPAL, getKrb_regionserver_principal());
+                .put(Config.getHbase().AUTHENTICATION_METHOD, getHadoop_security_authentication())
+                .put(Config.getKbr().KRB_KDC, getKrb_kdc())
+                .put(Config.getKbr().KRB_PASS, getKrb_password())
+                .put(Config.getKbr().KRB_REALM, getKrb_realm())
+                .put(Config.getKbr().KRB_USER, getKrb_user())
+                .put(Config.getKbr().KRB_MASTER_PRINCIPAL, getKrb_master_principal())
+                .put(Config.getKbr().KRB_REGIONSERVER_PRINCIPAL, getKrb_regionserver_principal());
 
         return config;
     }
