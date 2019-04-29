@@ -39,20 +39,18 @@ public abstract class RuleEngineBuild {
         String confFromFile = "";
         try {
             confFromFile = new String(Files.readAllBytes(Paths.get(((CmdlineOptions) options).getJSONConfig())));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Could not find config data: " + e);
             System.exit(1);
         }
         System.out.println("JSON config retrieved: " + confFromFile);
-        ExternalConfig ext_conf = ExternalConfig.getConfigFromString(confFromFile);
+        ExternalConfig extConf = ExternalConfig.getConfigFromString(confFromFile);
         String pipelineName = ((CmdlineOptions) options).getPipelineName();
         Config conf;
 
-
-        switch(pipelineName) {
+        switch (pipelineName) {
             case "full":
-                conf = ext_conf.getConfig();
+                conf = extConf.getConfig();
                 fullPipeline = FullPipelineBuilder.build(options, conf);
                 fullPipeline.run().waitUntilFinish();
                 break;

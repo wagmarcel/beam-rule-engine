@@ -88,7 +88,7 @@ public class RuleCondition implements Serializable {
         observation = other.observation;
     }
 
-    public RuleCondition clone() {
+    public RuleCondition copy() {
         RuleCondition rc = new RuleCondition(this);
         if (getTimeBasedState() != null) {
             rc.setTimeBasedState(getTimeBasedState());

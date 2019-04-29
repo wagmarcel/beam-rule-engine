@@ -59,7 +59,7 @@ public abstract class BaseRepository implements Serializable {
                 addCoprocessor(admin, table);
             }
             mutex.release();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

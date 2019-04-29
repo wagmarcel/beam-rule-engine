@@ -17,7 +17,6 @@
 
 package org.oisp.data;
 
-//import org.oisp.util.LogHelper;
 import org.oisp.conf.KerberosProperties;
 import org.oisp.conf.HbaseProperties;
 import org.apache.hadoop.conf.Configuration;
@@ -27,12 +26,8 @@ import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.security.UserProvider;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-//import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
-//import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 
 import javax.security.auth.Subject;
-import javax.security.auth.login.LoginException;
 import java.io.IOException;
 
 final class HbaseConnManager {
@@ -55,35 +50,13 @@ final class HbaseConnManager {
     }
 
     public Connection create() throws IOException {
-//        if (kerberosProperties.isEnabled()) {
-//            //logger.info("Creating hbase connection with kerberos auth");
-//            try {
-////                KrbLoginManager loginManager = KrbLoginManagerFactory.getInstance()
-////                        .getKrbLoginManagerInstance(kerberosProperties.getKdc(), kerberosProperties.getRealm());
-////                Subject subject = loginManager.loginWithCredentials(kerberosProperties.getUser(),
-////                        kerberosProperties.getPassword().toCharArray());
-////                loginManager.loginInHadoop(subject, hbaseConfiguration);
-//
-//                return ConnectionFactory.createConnection(hbaseConfiguration, getUserFromSubject(subject));
-//            } catch (LoginException e) {
-//                //logger.error("Create hbase connection failed. Unable to authorize with kerberos credentials: "
-//                 //       + "user - {}, realm - {}, kdc - {}", kerberosProperties.getUser(), kerberosProperties.getRealm(), kerberosProperties.getKdc());
-//                throw new IOException(e);
-//            }
-  //      } else {
-            return ConnectionFactory.createConnection(hbaseConfiguration);
-    //    }
-   }
+        return ConnectionFactory.createConnection(hbaseConfiguration);
+    }
 
     private User getUserFromSubject(Subject subject) throws IOException {
         return UserProvider.instantiate(hbaseConfiguration)
                 .create(UserGroupInformation.getUGIFromSubject(subject));
     }
-
-    // private User getNoKrbUserFromSubject(Configuration configuration, String krbUser) throws IOException {
-    //     return UserProvider.instantiate(configuration)
-    //             .create(UserGroupInformation.createRemoteUser(krbUser));
-    // }
 
     private static Configuration createHbaseConfiguration(String zkQuorum, KerberosProperties kerberosProperties) {
         Configuration hbaseConfig = HBaseConfiguration.create();

@@ -15,10 +15,8 @@ ADD src /app/src
 
 WORKDIR /app
 
+RUN mvn checkstyle:check
 RUN mvn clean package -Pflink-runner  -DskipTests
-
-
-
 
 FROM flink:1.5.4-alpine
 EXPOSE 6123 8081

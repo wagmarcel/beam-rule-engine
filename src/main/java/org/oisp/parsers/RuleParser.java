@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.io.Serializable;
 
-public class RuleParser implements Serializable{
+public class RuleParser implements Serializable {
 
     private final List<ComponentRulesResponse> componentsRulesResponse;
 

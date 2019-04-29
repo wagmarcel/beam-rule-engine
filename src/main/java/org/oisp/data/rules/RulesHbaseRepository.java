@@ -19,23 +19,35 @@ package org.oisp.data.rules;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
+import org.apache.hadoop.hbase.filter.CompareFilter;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.RowFilter;
 import org.oisp.data.BaseRepository;
 import org.oisp.data.HbaseValues;
 import org.oisp.data.RulesRepository;
 import org.oisp.collection.Rule;
 import org.oisp.conf.Config;
 import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class RulesHbaseRepository extends BaseRepository implements RulesRepository,Serializable {
+public class RulesHbaseRepository extends BaseRepository implements RulesRepository, Serializable {
 
     private static final byte[] columnFamily = Bytes.toBytes(HbaseValues.RULES_COLUMN_FAMILY);
     private static final byte[] columnName = Bytes.toBytes(HbaseValues.RULES_COLUMN_NAME);
@@ -118,13 +130,14 @@ public class RulesHbaseRepository extends BaseRepository implements RulesReposit
     }
 
     private List<Rule> jsonToRules(byte[] result) {
-        Type type = new TypeToken<List<Rule>>() { } .getType();
+        Type type = new TypeToken<List<Rule>>() {
+
+        }.getType();
         return gson.fromJson(Bytes.toString(result), type);
     }
 
     private void readObject(ObjectInputStream o)
-            throws IOException, ClassNotFoundException
-    {
+            throws IOException, ClassNotFoundException {
         o.defaultReadObject();
         gson = new Gson();
     }

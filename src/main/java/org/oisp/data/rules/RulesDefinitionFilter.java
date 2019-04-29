@@ -2,7 +2,7 @@ package org.oisp.data.rules;
 
 import com.google.common.collect.Lists;
 import org.oisp.collection.Rule;
-//import org.oisp.util.LogHelper;
+import org.oisp.utils.LogHelper;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 class RulesDefinitionFilter {
 
     private final Set<Rule> mergedRulesDefinition;
-    //private final Logger logger = LogHelper.getLogger(RulesDefinitionFilter.class);
+    private final Logger logger = LogHelper.getLogger(RulesDefinitionFilter.class);
 
     RulesDefinitionFilter(List<Rule> rulesDefinition) {
         mergedRulesDefinition = new HashSet<>();
@@ -44,7 +44,7 @@ class RulesDefinitionFilter {
             } else {
                 boolean result = mergedRulesDefinition.remove(r);
                 if (!result) {
-                    //logger.warn("Rule - {} with status DELETED not found in hbase!", r.getId());
+                    logger.warn("Rule - {} with status DELETED not found in hbase!", r.getId());
                 }
             }
         });

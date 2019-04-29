@@ -2,11 +2,9 @@ package org.oisp.data.rules;
 
 import com.google.gson.Gson;
 import org.oisp.collection.Rule;
-//import org.oisp.util.LogHelper;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
