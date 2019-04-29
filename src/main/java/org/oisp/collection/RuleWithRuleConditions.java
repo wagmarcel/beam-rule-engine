@@ -1,11 +1,7 @@
 package org.oisp.collection;
 
-import org.apache.beam.sdk.coders.DefaultCoder;
-import org.oisp.coder.RuleCoder;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
