@@ -2,7 +2,11 @@ package org.oisp.transformation;
 
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
-import org.oisp.collection.*;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Rule;
+import org.oisp.collection.RuleCondition;
+import org.oisp.collection.RuleWithRuleConditions;
+import org.oisp.collection.RulesWithObservation;
 import org.oisp.collection.subCollections.NormalizedStatisticsValues;
 
 import java.util.List;
@@ -24,7 +28,7 @@ public class CheckStatisticsRule extends DoFn<List<RulesWithObservation>, KV<Str
             for (Rule rule: rwo.getRules()) {
                 Observation observation = rwo.getObservation();
                 RuleWithRuleConditions mutableRWRC = new RuleWithRuleConditions(rule);
-                for (int i=0; i < rule.getConditions().size(); i++) {
+                for (int i = 0; i < rule.getConditions().size(); i++) {
                     RuleCondition rc = rule.getConditions().get(i);
                     Boolean condFulfillment;
                     if (!rc.isStatistics()) {

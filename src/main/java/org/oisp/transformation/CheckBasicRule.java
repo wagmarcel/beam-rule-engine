@@ -2,14 +2,16 @@ package org.oisp.transformation;
 
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
-import org.oisp.collection.*;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Rule;
+import org.oisp.collection.RuleCondition;
+import org.oisp.collection.RulesWithObservation;
 import org.oisp.rules.conditions.BasicConditionChecker;
 import org.oisp.utils.LogHelper;
 import org.oisp.collection.RuleWithRuleConditions;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.TreeMap;
 
 public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
 
@@ -27,7 +29,7 @@ public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, 
             for (Rule rule: rwo.getRules()) {
                 Observation observation = rwo.getObservation();
                 RuleWithRuleConditions mutableRWRC = new RuleWithRuleConditions(rule);
-                for (int i=0; i < rule.getConditions().size(); i++) {
+                for (int i = 0; i < rule.getConditions().size(); i++) {
                     RuleCondition rc = rule.getConditions().get(i);
                     Boolean condFulfillment;
                     if (rc.isTimebased() || rc.isStatistics()) {

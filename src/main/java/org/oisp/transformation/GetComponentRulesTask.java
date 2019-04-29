@@ -25,7 +25,6 @@ import org.oisp.data.rules.RulesHbaseRepository;
 import org.oisp.collection.Observation;
 import org.oisp.collection.Rule;
 import org.oisp.collection.RulesWithObservation;
-import org.oisp.collection.Message;
 import org.oisp.conf.Config;
 import org.oisp.utils.LogHelper;
 

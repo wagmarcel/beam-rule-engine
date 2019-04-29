@@ -34,7 +34,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidCatchingGenericException"})
-public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, List<Rule>>>{
+public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, List<Rule>>> {
 
     private static final String TASK_NAME = "downloadRules";
     private final RulesApi rulesApi;
@@ -54,11 +54,9 @@ public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, Lis
         //getLogger().info("Synchronizing dashboard rules...");
         try {
             componentsRules = getComponentsRules();
-          //  getLogger().debug("Components Rules: {}", new Gson().toJson(componentsRules));
-          c.output(componentsRules);
+            //  getLogger().debug("Components Rules: {}", new Gson().toJson(componentsRules));
+            c.output(componentsRules);
         } catch (InvalidDashboardResponseException e) {
-            //getLogger().error("Unable to get active rules", e);
-        } catch (Exception e) {
             LOG.error("Unknown error during rules downloading.", e);
         }
     }

@@ -17,9 +17,7 @@
 
 package org.oisp.transformation;
 
-import org.oisp.transformation.KafkaSourceProcessor;
 import org.oisp.conf.Config;
-import java.util.Properties;
 
 public class KafkaSourceRulesUpdateProcessor extends KafkaSourceProcessor {
 

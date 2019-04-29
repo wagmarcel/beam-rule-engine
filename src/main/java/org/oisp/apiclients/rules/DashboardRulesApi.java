@@ -24,7 +24,11 @@ import org.oisp.apiclients.InvalidDashboardResponseException;
 import org.oisp.apiclients.rules.model.ComponentRulesResponse;
 import org.oisp.rules.RuleStatus;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -108,11 +112,8 @@ public class DashboardRulesApi implements RulesApi, Serializable {
 
 
     private void readObject(ObjectInputStream o)
-            throws IOException, ClassNotFoundException
-    {
+            throws IOException, ClassNotFoundException {
         o.defaultReadObject();
         template = CustomRestTemplate.build(this.config).getRestTemplate();
     }
-
-
 }

@@ -24,7 +24,11 @@ import org.oisp.apiclients.InvalidDashboardResponseException;
 import org.oisp.collection.Observation;
 import org.oisp.collection.Rule;
 import org.oisp.collection.RulesWithObservation;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -111,8 +115,7 @@ public class DashboardAlertsApi implements AlertsApi, Serializable {
     }
 
     private void readObject(ObjectInputStream o)
-            throws IOException, ClassNotFoundException
-    {
+            throws IOException, ClassNotFoundException {
         o.defaultReadObject();
         template = CustomRestTemplate.build(config).getRestTemplate();
     }

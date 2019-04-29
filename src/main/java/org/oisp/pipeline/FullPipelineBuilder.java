@@ -30,9 +30,9 @@ import org.oisp.transformation.GetComponentRulesTask;
 import org.oisp.transformation.KafkaSourceObservationsProcessor;
 import org.oisp.transformation.KafkaSourceProcessor;
 import org.oisp.transformation.KafkaSourceRulesUpdateProcessor;
-import org.oisp.transformation.PersistBasicRuleState;
+import org.oisp.transformation.PersistRuleState;
 import org.oisp.transformation.PersistRulesTask;
-import org.oisp.transformation.PersistStatisticsRule;
+import org.oisp.transformation.PersistStatisticsRuleState;
 import org.oisp.transformation.PersistTimeBasedRuleState;
 import org.oisp.transformation.SendAlertFromRule;
 
@@ -63,11 +63,11 @@ public final class FullPipelineBuilder {
         PCollection<KV<String, RuleWithRuleConditions>> statisticsRulePipeline =
                 rwo
                         .apply(ParDo.of(new CheckStatisticsRule()))
-                        .apply(ParDo.of(new PersistStatisticsRule()));
+                        .apply(ParDo.of(new PersistStatisticsRuleState()));
         PCollectionList<KV<String, RuleWithRuleConditions>> ruleColl = PCollectionList.of(basicRulePipeline).and(timeBasedRulePipeline).and(statisticsRulePipeline);
         ruleColl
                 .apply(Flatten.<KV<String, RuleWithRuleConditions>>pCollections())
-                .apply(ParDo.of(new PersistBasicRuleState()))
+                .apply(ParDo.of(new PersistRuleState()))
                 .apply(ParDo.of(new CheckRuleFulfillment()))
                 .apply(ParDo.of(new SendAlertFromRule(conf)));
 

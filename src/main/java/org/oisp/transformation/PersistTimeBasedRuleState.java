@@ -1,26 +1,24 @@
 package org.oisp.transformation;
 
-import com.sun.jdi.IntegerValue;
 import org.apache.beam.sdk.coders.MapCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.coders.VarIntCoder;
-import org.apache.beam.sdk.state.MapState;
 import org.apache.beam.sdk.state.StateSpec;
 import org.apache.beam.sdk.state.StateSpecs;
 import org.apache.beam.sdk.state.ValueState;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.util.VarInt;
 import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.Rule;
 import org.oisp.collection.RuleCondition;
 import org.oisp.collection.RuleWithRuleConditions;
-import org.oisp.transformation.storage.RuleComponentsStorage;
 
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleConditions>, KV<String, RuleWithRuleConditions>> {
+public class PersistTimeBasedRuleState extends DoFn<KV<String, RuleWithRuleConditions>, KV<String, RuleWithRuleConditions>> {
+    static final Integer SECONDSTOKEEPINSTATE = 60;
+    static final Integer MILLISECONDSPERSECOND = 1000;
     @DoFn.StateId("ruleCondHash") //contains the RC with timebased state (i.e. hash with timestamp and fulfillment
     private final StateSpec<ValueState<Map<Integer, RuleCondition>>> state =
             StateSpecs.value(MapCoder.<Integer, RuleCondition>of(VarIntCoder.of(), SerializableCoder.of(RuleCondition.class)));
@@ -68,7 +66,7 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
         Boolean removeSubTree = false;
         Long latestTS = rc.getTimeBasedState().lastKey();
         Long latestInSubTree = timeBasedSubtree.lastKey();
-        if (latestTS - latestInSubTree > 60 * 1000) {
+        if (latestTS - latestInSubTree > SECONDSTOKEEPINSTATE * MILLISECONDSPERSECOND) {
             removeSubTree = true;
         }
         if (timeBasedSubtree.size() < 2) {
@@ -78,7 +76,8 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
             return false;
         }
         Integer numFulfilled = 0;
-        Long firstTS = -1L, lastTS = -1L;
+        Long firstTS = -1L;
+        Long lastTS = -1L;
         for (Map.Entry<Long, Boolean> entry : timeBasedSubtree.entrySet()) {
             if (entry.getValue()) {
                 if (numFulfilled == 0) {
@@ -88,7 +87,7 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
                 lastTS = entry.getKey();
             }
         }
-        if (lastTS - firstTS >= rc.getTimeLimit() * 1000) {
+        if (lastTS - firstTS >= rc.getTimeLimit() * MILLISECONDSPERSECOND) {
             if (removeSubTree) {
                 timeBasedSubtree.clear();
             }
@@ -111,7 +110,7 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
         Long firstTS = timeBasedState.firstKey();
         Long nextTS = firstTS;
         Boolean done = false;
-        while(!done) {
+        while (!done) {
             for (Map.Entry<Long, Boolean> entry : timeBasedState.tailMap(firstTS).entrySet()) {
                 Boolean fulFillmentValue = entry.getValue();
                 if (!fulFillmentValue) {
@@ -120,7 +119,7 @@ public class PersistTimeBasedRuleState extends DoFn<KV<String,RuleWithRuleCondit
             }
             //at this point we either have a nextTS!=firstTS which is unfulfilled or nextTS==firstTS
             if (nextTS != firstTS) {
-                //TODO: We currently are assuming that all observations arrive in order
+                //todo: We currently are assuming that all observations arrive in order
                 //Out of order processing should be considered but it might change
                 timeBasedState.headMap(nextTS - 1).clear();
                 firstTS = nextTS;

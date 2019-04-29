@@ -54,8 +54,7 @@ public class PersistRulesTask extends DoFn<Map<String, List<Rule>>, byte[]> {
         this.rulesApi = rulesApi;
         try {
             rulesRepository.createTable();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             LOG.error("Error while creating HBase Tables " + e);
         }
     }

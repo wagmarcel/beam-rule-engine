@@ -1,7 +1,6 @@
 package org.oisp.transformation;
 
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
 import org.oisp.collection.Rule;
@@ -15,8 +14,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 
-public class CheckRuleFulfillment extends DoFn<KV<String,RuleWithRuleConditions>, Rule> {
-
+public class CheckRuleFulfillment extends DoFn<KV<String, RuleWithRuleConditions>, Rule> {
 
     @ProcessElement
     public void processElement(ProcessContext c) {
@@ -28,7 +26,7 @@ public class CheckRuleFulfillment extends DoFn<KV<String,RuleWithRuleConditions>
         Map<Integer, RuleCondition> ruleConditionMap = rwrc.getRcHash();
         if (mutableRule.getConditionOperator() == ConditionOperators.AND) {
             Boolean result = true;
-            for (int i = 0; i< mutableRule.getConditions().size(); i++) {
+            for (int i = 0; i < mutableRule.getConditions().size(); i++) {
                 List<RuleCondition> rcl = mutableRule.getConditions();
                 if (rcl != null && rcl.get(i) != null && rcl.get(i).getFulfilled()) {
                     mutableRule.getConditions().set(i, rcl.get(i));
@@ -39,8 +37,7 @@ public class CheckRuleFulfillment extends DoFn<KV<String,RuleWithRuleConditions>
             if (result) {
                 c.output(mutableRule);
             }
-        }
-        else {
+        } else {
             Boolean result = false;
             for (SortedMap.Entry<Integer, RuleCondition> entry : ruleConditionMap.entrySet()) {
                 if (entry.getValue().getFulfilled()) {

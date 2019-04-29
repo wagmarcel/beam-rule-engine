@@ -2,14 +2,16 @@ package org.oisp.transformation;
 
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.KV;
-import org.oisp.collection.*;
+import org.oisp.collection.Observation;
+import org.oisp.collection.Rule;
+import org.oisp.collection.RuleCondition;
+import org.oisp.collection.RuleWithRuleConditions;
+import org.oisp.collection.RulesWithObservation;
 import org.oisp.rules.conditions.ConditionFunctionChecker;
 import org.oisp.utils.LogHelper;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
@@ -24,10 +26,10 @@ public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<Stri
 
     void sendFulfillmentState(ProcessContext c) {
         for (RulesWithObservation rwo : observationRulesList) {
-            for (Rule rule: rwo.getRules()) {
+            for (Rule rule : rwo.getRules()) {
                 RuleWithRuleConditions  mutableRWRC = new RuleWithRuleConditions(rule);
                 Observation observation = rwo.getObservation();
-                for (int i = 0; i< rule.getConditions().size();i++) {
+                for (int i = 0; i < rule.getConditions().size(); i++) {
                     RuleCondition rc = rule.getConditions().get(i);
                     if (!rc.isTimebased()) {
                         continue;

@@ -18,9 +18,7 @@
 package org.oisp.apiclients;
 
 import org.oisp.conf.Config;
-import org.oisp.conf.ConfigFactory;
 import java.io.Serializable;
-//import io.gearpump.cluster.UserConfig;
 
 public class DashboardConfigProvider implements DashboardConfig, Serializable {
 
@@ -32,11 +30,17 @@ public class DashboardConfigProvider implements DashboardConfig, Serializable {
         Object token = userConfig.get(Config.DASHBOARD_TOKEN_PROPERTY);
         Object url = userConfig.get(Config.DASHBOARD_URL_PROPERTY);
 
-        if (token != null) this.token = token.toString();
-        else this.token = null;
+        if (token != null) {
+            this.token = token.toString();
+        } else {
+            this.token = null;
+        }
 
-        if (url != null) this.url = url.toString();
-        else this.url = null;
+        if (url != null) {
+            this.url = url.toString();
+        } else {
+            this.url = null;
+        }
 
         this.strictSSL = parseStrictSSLOption(userConfig);
     }
