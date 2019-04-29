@@ -144,6 +144,25 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <configLocation>checkstyle/checkstyle.xml</configLocation>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+                        <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
         <configuration>
@@ -584,6 +603,5 @@
     </dependency>
 
   </dependencies>
-
 
 </project>
