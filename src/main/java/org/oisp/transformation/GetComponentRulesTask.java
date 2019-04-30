@@ -39,17 +39,16 @@ import java.util.stream.Collectors;
 
 public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWithObservation>> {
 
-    private static final String TASK_NAME = "getRulesForComponent";
     private List<Observation> observations;
     private static final Logger LOG = LogHelper.getLogger(PersistRulesTask.class);
 
     private RulesRepository rulesRepository;
 
     public GetComponentRulesTask(Config userConfig) {
-        this(userConfig, new RulesHbaseRepository(userConfig));
+        this(new RulesHbaseRepository(userConfig));
     }
 
-    public GetComponentRulesTask(Config userConfig, RulesRepository rulesRepository) {
+    public GetComponentRulesTask(RulesRepository rulesRepository) {
         this.rulesRepository = rulesRepository;
     }
 

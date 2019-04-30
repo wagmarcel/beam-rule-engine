@@ -25,6 +25,8 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import javax.net.ssl.SSLContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.oisp.utils.LogHelper;
+import org.slf4j.Logger;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -36,9 +38,8 @@ import java.security.cert.X509Certificate;
 public final class CustomRestTemplate {
 
 
-    //private static final Logger logger = LogHelper.getLogger(CustomRestTemplate.class);
+    private static final Logger logger = LogHelper.getLogger(CustomRestTemplate.class);
     private final RestTemplate template;
-    private static final int SSL_PORT = 443;
 
     private CustomRestTemplate(DashboardConfig dashboardConfig) {
         if (!dashboardConfig.isStrictSSL()) {
@@ -57,7 +58,6 @@ public final class CustomRestTemplate {
     }
 
     private ClientHttpRequestFactory createHttpRequestFactory() {
-        //HttpComponentsClientHttpRequestFactory requestFactory = null;
         try {
             TrustStrategy acceptingTrustStrategy = new TrustStrategy() {
                 @Override
@@ -77,19 +77,9 @@ public final class CustomRestTemplate {
             requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             return requestFactory;
-            //switchOffSSLVerification(requestFactory.getHttpClient().);
         } catch (GeneralSecurityException e) {
-            //logger.error("Error during disabling strict ssl certificate verification", e);
+            logger.error("Error during disabling strict ssl certificate verification", e);
         }
         return null;
     }
-
-//    private HttpClient switchOffSSLVerification(HttpClient httpClient) throws GeneralSecurityException {
-//
-//        httpClient.
-//        SSLSocketFactory socketFactory = new SSLSocketFactory(acceptingTrustStrategy, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-//        httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", SSL_PORT, socketFactory));
-//
-//        return httpClient;
-//    }
 }

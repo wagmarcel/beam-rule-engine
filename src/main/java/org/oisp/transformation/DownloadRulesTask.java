@@ -36,25 +36,22 @@ import org.slf4j.Logger;
 @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidCatchingGenericException"})
 public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, List<Rule>>> {
 
-    private static final String TASK_NAME = "downloadRules";
     private final RulesApi rulesApi;
     private Map<String, List<Rule>> componentsRules;
     private static final Logger LOG = LogHelper.getLogger(DownloadRulesTask.class);
     public DownloadRulesTask(Config userConfig) {
-        this(userConfig, new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
+        this(new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
     }
 
-    public DownloadRulesTask(Config userConfig, RulesApi rulesApi) {
+    public DownloadRulesTask(RulesApi rulesApi) {
         this.rulesApi = rulesApi;
     }
 
 
     @ProcessElement
     public void processElement(ProcessContext c) {
-        //getLogger().info("Synchronizing dashboard rules...");
         try {
             componentsRules = getComponentsRules();
-            //  getLogger().debug("Components Rules: {}", new Gson().toJson(componentsRules));
             c.output(componentsRules);
         } catch (InvalidDashboardResponseException e) {
             LOG.error("Unknown error during rules downloading.", e);

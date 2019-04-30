@@ -109,7 +109,6 @@ public final class FullPipelineBuilder {
     static class StringToKVFn extends DoFn<Long, KV<String, String>> {
         @DoFn.ProcessElement
         public void processElement(ProcessContext c) {
-            Long seqnum = c.element();
             KV<String, String> outputKv = KV.<String, String>of("", "rules-engine");
             c.output(outputKv);
         }

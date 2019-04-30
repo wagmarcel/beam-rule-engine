@@ -16,8 +16,7 @@ import java.util.TreeMap;
 
 public class CheckTimeBasedRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
     private List<RulesWithObservation> observationRulesList;
-    private List<RuleCondition> fullFilledRuleConditions;
-    private static final Logger LOG = LogHelper.getLogger(CheckBasicRule.class);
+    //private static final Logger LOG = LogHelper.getLogger(CheckBasicRule.class);
     @ProcessElement
     public void processElement(ProcessContext c) {
         observationRulesList = c.element();

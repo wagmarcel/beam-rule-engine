@@ -41,7 +41,7 @@ public final class KerberosProperties {
 
     public static KerberosProperties fromConfig(Config config) {
         KerberosProperties kerberosProperties = new KerberosProperties();
-        kerberosProperties.enabled = (config.get(Config.getHbase().KERBEROS_AUTHENTICATION) != null)
+        kerberosProperties.enabled = config.get(Config.getHbase().KERBEROS_AUTHENTICATION) != null
                 && config.get(Config.getHbase().KERBEROS_AUTHENTICATION)
                 .equals(config.get(Config.getHbase().AUTHENTICATION_METHOD));
         if (!kerberosProperties.enabled) {

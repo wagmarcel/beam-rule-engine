@@ -23,16 +23,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.security.User;
-import org.apache.hadoop.hbase.security.UserProvider;
-import org.apache.hadoop.security.UserGroupInformation;
-
-import javax.security.auth.Subject;
 import java.io.IOException;
 
 final class HbaseConnManager {
 
-    private final KerberosProperties kerberosProperties;
     private final Configuration hbaseConfiguration;
     //private static final Logger logger = LogHelper.getLogger(HbaseConnManager.class);
 
@@ -42,7 +36,6 @@ final class HbaseConnManager {
 
     private HbaseConnManager(KerberosProperties kerberosProperties, Configuration hbaseConfiguration) {
         this.hbaseConfiguration = hbaseConfiguration;
-        this.kerberosProperties = kerberosProperties;
     }
 
     public static HbaseConnManager newInstance(KerberosProperties kerberosProperties, String zkQuorum) {
@@ -51,11 +44,6 @@ final class HbaseConnManager {
 
     public Connection create() throws IOException {
         return ConnectionFactory.createConnection(hbaseConfiguration);
-    }
-
-    private User getUserFromSubject(Subject subject) throws IOException {
-        return UserProvider.instantiate(hbaseConfiguration)
-                .create(UserGroupInformation.getUGIFromSubject(subject));
     }
 
     private static Configuration createHbaseConfiguration(String zkQuorum, KerberosProperties kerberosProperties) {

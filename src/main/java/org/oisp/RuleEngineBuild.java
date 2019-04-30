@@ -30,9 +30,6 @@ public abstract class RuleEngineBuild {
         PipelineOptionsFactory.register(CmdlineOptions.class);
         //options.setRunner(FlinkRunner.class);
         //BasicConfigurator.configure();
-        Pipeline heartbeat;
-        Pipeline rulesUpdate;
-        Pipeline observationPipeline;
         Pipeline fullPipeline;
 
         //read json config from file - needed because stupid mvn cannot read JSON from comdline. Unbelievable, but true.

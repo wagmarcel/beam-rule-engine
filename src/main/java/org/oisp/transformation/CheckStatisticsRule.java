@@ -30,7 +30,6 @@ public class CheckStatisticsRule extends DoFn<List<RulesWithObservation>, KV<Str
                 RuleWithRuleConditions mutableRWRC = new RuleWithRuleConditions(rule);
                 for (int i = 0; i < rule.getConditions().size(); i++) {
                     RuleCondition rc = rule.getConditions().get(i);
-                    Boolean condFulfillment;
                     if (!rc.isStatistics()) {
                         continue;
                     }
