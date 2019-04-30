@@ -19,7 +19,6 @@ package org.oisp.transformation;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
-import org.apache.beam.sdk.io.kafka.KafkaIO.Read;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.oisp.conf.Config;
@@ -31,7 +30,6 @@ public class KafkaSourceProcessor {
     public static final String KAFKA_URI_PROPERTY = Config.KAFKA_URI_PROPERTY;
     public static final String KAFKA_ZOOKEEPER_PROPERTY = Config.KAFKA_ZOOKEEPER_PROPERTY;
 
-    private static String name;
 
     private KafkaIO.Read<String, byte[]> transform = null;
 
@@ -48,7 +46,6 @@ public class KafkaSourceProcessor {
         Config consumerProperties = new ConfigFactory().getConfig();
         consumerProperties.put("zookeeper.connect", zookeeperQuorum);
         consumerProperties.put("group.id", "beam");
-        //consumerProperties.put("offsets.storage", "kafka");
         consumerProperties.put("enable.auto.commit", "true");
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
@@ -58,7 +55,6 @@ public class KafkaSourceProcessor {
                 .withKeyDeserializer(StringDeserializer.class)
                 .withValueDeserializer(ByteArrayDeserializer.class)
                 .updateConsumerProperties(consumerProperties.getHash())
-                //.withLogAppendTime()
                 .withReadCommitted()
                 .commitOffsetsInFinalize();
 

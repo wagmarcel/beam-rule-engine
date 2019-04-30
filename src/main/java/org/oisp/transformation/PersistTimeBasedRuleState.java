@@ -16,11 +16,12 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class PersistTimeBasedRuleState extends DoFn<KV<String, RuleWithRuleConditions>, KV<String, RuleWithRuleConditions>> {
     static final Integer SECONDSTOKEEPINSTATE = 60;
     static final Integer MILLISECONDSPERSECOND = 1000;
     @DoFn.StateId("ruleCondHash") //contains the RC with timebased state (i.e. hash with timestamp and fulfillment
-    private final StateSpec<ValueState<Map<Integer, RuleCondition>>> state =
+    private final StateSpec<ValueState<Map<Integer, RuleCondition>>> stateSpec =
             StateSpecs.value(MapCoder.<Integer, RuleCondition>of(VarIntCoder.of(), SerializableCoder.of(RuleCondition.class)));
 
     @ProcessElement

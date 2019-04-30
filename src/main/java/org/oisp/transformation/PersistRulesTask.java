@@ -40,16 +40,15 @@ import java.util.stream.Collectors;
 
 public class PersistRulesTask extends DoFn<Map<String, List<Rule>>, byte[]> {
 
-    private static final String TASK_NAME = "persistRules";
     private RulesRepository rulesRepository;
     private final RulesApi rulesApi;
     private static final Logger LOG = LogHelper.getLogger(PersistRulesTask.class);
 
     public PersistRulesTask(Config userConfig) {
-        this(userConfig, new RulesHbaseRepository(userConfig), new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
+        this(new RulesHbaseRepository(userConfig), new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
     }
 
-    public PersistRulesTask(Config userConfig, RulesRepository rulesRepository, RulesApi rulesApi) {
+    public PersistRulesTask(RulesRepository rulesRepository, RulesApi rulesApi) {
         this.rulesRepository = rulesRepository;
         this.rulesApi = rulesApi;
         try {

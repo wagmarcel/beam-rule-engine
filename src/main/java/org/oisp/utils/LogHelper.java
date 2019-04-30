@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class LogHelper {
-    private LogHelper(Class clazz) {
+    private LogHelper() {
     }
 
     public static Logger getLogger(Class clazz) {

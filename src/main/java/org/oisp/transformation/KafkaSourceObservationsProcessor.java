@@ -24,8 +24,6 @@ public class KafkaSourceObservationsProcessor extends KafkaSourceProcessor {
 
     public static final String KAFKA_TOPIC_PROPERTY = Config.KAFKA_TOPIC_OBSERVATION_PROPERTY;
 
-    private static final String NAME = "KafkaSourceObservations";
-
     public KafkaSourceObservationsProcessor(Config userConfig) {
        super(userConfig, userConfig.get(KAFKA_TOPIC_PROPERTY).toString());
     }

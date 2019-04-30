@@ -7,12 +7,9 @@ import org.oisp.collection.Rule;
 import org.oisp.collection.RuleCondition;
 import org.oisp.collection.RulesWithObservation;
 import org.oisp.rules.conditions.BasicConditionChecker;
-import org.oisp.utils.LogHelper;
 import org.oisp.collection.RuleWithRuleConditions;
-import org.slf4j.Logger;
 
 import java.util.List;
-
 public class CheckBasicRule extends DoFn<List<RulesWithObservation>, KV<String, RuleWithRuleConditions>> {
 
     private List<RulesWithObservation> observationRulesList;

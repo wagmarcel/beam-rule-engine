@@ -19,11 +19,12 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class PersistStatisticsRuleState extends DoFn<KV<String, RuleWithRuleConditions>, KV<String, RuleWithRuleConditions>> {
 
     static final Integer SECONDINMILLISECONDS = 1000;
     @DoFn.StateId("ruleCondHash") //contains the RC with statistic state (i.e. StatisticValue)
-    private final StateSpec<ValueState<Map<Integer, RuleCondition>>> state =
+    private final StateSpec<ValueState<Map<Integer, RuleCondition>>> stateSpec =
             StateSpecs.value(MapCoder.<Integer, RuleCondition>of(VarIntCoder.of(), SerializableCoder.of(RuleCondition.class)));
 
     @ProcessElement

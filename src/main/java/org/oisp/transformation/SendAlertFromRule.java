@@ -22,10 +22,10 @@ public class SendAlertFromRule extends DoFn<Rule, Byte> {
     private final AlertsApi alertsApi;
 
     public SendAlertFromRule(Config userConfig) {
-        this(userConfig, new DashboardAlertsApi(new DashboardConfigProvider(userConfig)));
+        this(new DashboardAlertsApi(new DashboardConfigProvider(userConfig)));
     }
 
-    public SendAlertFromRule(Config userConfig, AlertsApi alertsApi) {
+    public SendAlertFromRule(AlertsApi alertsApi) {
         this.alertsApi = alertsApi;
     }
 

@@ -10,16 +10,16 @@ import org.oisp.collection.RuleWithRuleConditions;
 import org.oisp.collection.RuleCondition;
 import java.util.Map;
 
-
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class PersistRuleState extends DoFn<KV<String, RuleWithRuleConditions>, KV<String, RuleWithRuleConditions>> {
 
 
     @StateId("ruleCondHash")
-    private final StateSpec<ValueState<RuleWithRuleConditions>> state = StateSpecs.value();
+    private final StateSpec<ValueState<RuleWithRuleConditions>> stateSpec = StateSpecs.value();
 
     @ProcessElement
     public void processElement(ProcessContext c,
-                               @StateId("ruleCondHash") ValueState<RuleWithRuleConditions> state) {
+                               @StateId("ruleCondHash") ValueState<RuleWithRuleConditions> state) { //NOPMD
 
         //Record all ruleconditions per Rule
         RuleWithRuleConditions rarc = c.element().getValue();

@@ -31,10 +31,10 @@ final class HbaseConnManager {
     //private static final Logger logger = LogHelper.getLogger(HbaseConnManager.class);
 
     private HbaseConnManager(KerberosProperties kerberosProperties, String zkQuorum) {
-        this(kerberosProperties, createHbaseConfiguration(zkQuorum, kerberosProperties));
+        this(createHbaseConfiguration(zkQuorum, kerberosProperties));
     }
 
-    private HbaseConnManager(KerberosProperties kerberosProperties, Configuration hbaseConfiguration) {
+    private HbaseConnManager(Configuration hbaseConfiguration) {
         this.hbaseConfiguration = hbaseConfiguration;
     }
 

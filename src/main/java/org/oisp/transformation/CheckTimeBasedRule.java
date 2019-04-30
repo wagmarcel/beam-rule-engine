@@ -8,8 +8,6 @@ import org.oisp.collection.RuleCondition;
 import org.oisp.collection.RuleWithRuleConditions;
 import org.oisp.collection.RulesWithObservation;
 import org.oisp.rules.conditions.ConditionFunctionChecker;
-import org.oisp.utils.LogHelper;
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.TreeMap;
