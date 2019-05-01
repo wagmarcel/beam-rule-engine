@@ -76,6 +76,7 @@ public class DashboardRulesApi implements RulesApi, Serializable {
             if (resp.getStatusCode() != HttpStatus.OK) {
                 throw new InvalidDashboardResponseException("Invalid response on - " + resp.getStatusCode());
             }
+
             return resp.getBody();
         } catch (RestClientException e) {
             throw new InvalidDashboardResponseException("Unknown dashboard response error.", e);

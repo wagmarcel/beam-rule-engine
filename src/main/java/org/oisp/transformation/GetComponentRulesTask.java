@@ -21,12 +21,16 @@ package org.oisp.transformation;
 import org.apache.beam.sdk.transforms.DoFn;
 
 import org.apache.beam.sdk.values.PCollectionView;
-import org.oisp.data.RulesRepository;
-import org.oisp.data.rules.RulesHbaseRepository;
+import org.oisp.apiclients.DashboardConfigProvider;
+import org.oisp.apiclients.InvalidDashboardResponseException;
+import org.oisp.apiclients.rules.DashboardRulesApi;
+import org.oisp.apiclients.rules.RulesApi;
+import org.oisp.apiclients.rules.model.ComponentRulesResponse;
 import org.oisp.collection.Observation;
 import org.oisp.collection.Rule;
 import org.oisp.collection.RulesWithObservation;
 import org.oisp.conf.Config;
+import org.oisp.parsers.RuleParser;
 import org.oisp.utils.LogHelper;
 
 
@@ -43,22 +47,43 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
     private List<Observation> observations;
     private static final Logger LOG = LogHelper.getLogger(PersistRulesTask.class);
     private PCollectionView<Map<String, Long>> sideInput;
+    private RulesApi rulesApi;
+    private Map<String, List<Rule>> componentsRules;
+    private Long componentRuleversion;
 
-    private RulesRepository rulesRepository;
+    @Setup
+    public void setup() {
+        updateComponentRules();
+        componentRuleversion = 0L;
 
+    }
     public GetComponentRulesTask(Config userConfig, PCollectionView<Map<String, Long>> sideInput) {
-        this(new RulesHbaseRepository(userConfig));
+        //this(new RulesHbaseRepository(userConfig));
+        rulesApi = new DashboardRulesApi(new DashboardConfigProvider(userConfig));
         this.sideInput = sideInput;
     }
 
-    public GetComponentRulesTask(RulesRepository rulesRepository) {
-        this.rulesRepository = rulesRepository;
+    private void updateComponentRules() {
+        try {
+            componentsRules = getComponentsRules();
+        } catch (InvalidDashboardResponseException e) {
+            LOG.error("Error during searching rules in hbase - ", e);
+        }
     }
+    /*public GetComponentRulesTask(RulesRepository rulesRepository) {
+        this.rulesRepository = rulesRepository;
+    }*/
 
     @ProcessElement
     public void processElement(ProcessContext c) {
         try {
             observations = c.element();
+            //check componentRuleversion/sequence number to trigger rules update if needed
+            Long newComponentRuleVersion = c.sideInput(sideInput).get("ver");
+            if (newComponentRuleVersion != componentRuleversion) {
+                updateComponentRules();
+                componentRuleversion = newComponentRuleVersion;
+            }
             System.out.println("Marcel934: " + c.sideInput(sideInput).get("ver"));
             c.output(getActiveObservations());
         } catch (IOException e) {
@@ -84,7 +109,7 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
         String accountId = observations.stream()
                 .findFirst().get().getAid();
 
-        Map<String, List<Rule>> componentsRules = rulesRepository.getComponentsRules(accountId, componentsIds);
+        //Map<String, List<Rule>> componentsRules = rulesRepository.getComponentsRules(accountId, componentsIds);
 
         return observations.stream()
                 .map(observation -> new RulesWithObservation(observation, componentsRules.get(observation.getCid())))
@@ -95,4 +120,10 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
         return rulesWithObservation.getRules() != null && rulesWithObservation.getRules().size() > 0;
     }
 
+    private Map<String, List<Rule>> getComponentsRules() throws InvalidDashboardResponseException {
+        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules();
+        RuleParser ruleParser = new RuleParser(componentsRules);
+        Map<String, List<Rule>> result = ruleParser.getComponentRules();
+        return result;
+    }
 }
