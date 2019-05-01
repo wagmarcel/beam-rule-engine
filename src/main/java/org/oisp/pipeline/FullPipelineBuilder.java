@@ -7,12 +7,22 @@ import org.apache.beam.sdk.io.GenerateSequence;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.kafka.KafkaRecord;
 import org.apache.beam.sdk.options.PipelineOptions;
+import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.SimpleFunction;
+import org.apache.beam.sdk.transforms.View;
+import org.apache.beam.sdk.transforms.windowing.AfterProcessingTime;
+import org.apache.beam.sdk.transforms.windowing.GlobalWindows;
+import org.apache.beam.sdk.transforms.windowing.Repeatedly;
+import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
+import org.apache.beam.sdk.values.PCollectionView;
+import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import org.joda.time.Duration;
@@ -36,7 +46,9 @@ import org.oisp.transformation.PersistStatisticsRuleState;
 import org.oisp.transformation.PersistTimeBasedRuleState;
 import org.oisp.transformation.SendAlertFromRule;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class FullPipelineBuilder {
 
@@ -46,11 +58,36 @@ public final class FullPipelineBuilder {
     public static Pipeline build(PipelineOptions options, Config conf) {
         Pipeline p = Pipeline.create(options);
 
+
+        //Setup Kafka here becasue it will be used as sideinput and rule update pipeline
+        KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
+        PCollection<KV<String, String>> kafkaUpdates = p.apply(rulesKafka.getTransform())
+                .apply(ParDo.of(new CombineKVFromByteArrayFn()));
+
+        //Side input
+        PCollectionView<Map<String, Long>> kafkaSideInput =
+                kafkaUpdates
+                        .apply(Window.<KV<String, String>>into(new GlobalWindows())
+                        .triggering(Repeatedly.forever(AfterProcessingTime.pastFirstElementInPane())).discardingFiredPanes())
+
+                        .apply(Count.globally())
+                        .apply(ParDo.of(new LongToKVFn()))
+                        .apply(MapElements
+                                .via(
+                                new SimpleFunction<KV<String, Long>, Map<String, Long>> () {
+                                    public Map<String, Long> apply(KV<String, Long> inp) {
+                                        Map<String, Long> map = new HashMap<String, Long>();
+                                        map.put("ver", Long.valueOf((int)(Math.random() * 10)));
+                                        return map;
+                                    }
+                                }))
+                        .apply(View.asSingleton());
         //Observation Pipeline
         KafkaSourceObservationsProcessor observationsKafka = new KafkaSourceObservationsProcessor(conf);
         PCollection<List<RulesWithObservation>> rwo = p.apply(observationsKafka.getTransform())
                 .apply(ParDo.of(new KafkaToObservationFn()))
-                .apply(ParDo.of(new GetComponentRulesTask(conf)));
+                .apply(ParDo.of(new GetComponentRulesTask(conf, kafkaSideInput))
+                .withSideInputs(kafkaSideInput));
         PCollection<KV<String, RuleWithRuleConditions>> basicRulePipeline =
                 rwo
                         .apply(ParDo.of(new CheckBasicRule()));
@@ -84,11 +121,12 @@ public final class FullPipelineBuilder {
                         .withValueSerializer(StringSerializer.class));
 
         //Rules-Update
-        KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
+        //KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
         DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
         PersistRulesTask persistRulesTask = new PersistRulesTask(conf);
-        p.apply(rulesKafka.getTransform())
-                .apply(ParDo.of(new CombineKVFromByteArrayFn()))
+        /*p.apply(rulesKafka.getTransform())
+                .apply(ParDo.of(new CombineKVFromByteArrayFn()))*/
+        kafkaUpdates
                 .apply(ParDo.of(downloadRulesTask))
                 .apply(ParDo.of(persistRulesTask));
 
@@ -122,5 +160,10 @@ public final class FullPipelineBuilder {
             c.output(outputKv);
         }
     }
-
+    static class LongToKVFn extends DoFn<Long, KV<String, Long>> {
+        @ProcessElement
+        public void processElement(ProcessContext c) {
+            c.output(KV.of("ver", 1L));
+        }
+    }
 }

@@ -20,6 +20,7 @@ package org.oisp.transformation;
 
 import org.apache.beam.sdk.transforms.DoFn;
 
+import org.apache.beam.sdk.values.PCollectionView;
 import org.oisp.data.RulesRepository;
 import org.oisp.data.rules.RulesHbaseRepository;
 import org.oisp.collection.Observation;
@@ -41,11 +42,13 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
 
     private List<Observation> observations;
     private static final Logger LOG = LogHelper.getLogger(PersistRulesTask.class);
+    private PCollectionView<Map<String, Long>> sideInput;
 
     private RulesRepository rulesRepository;
 
-    public GetComponentRulesTask(Config userConfig) {
+    public GetComponentRulesTask(Config userConfig, PCollectionView<Map<String, Long>> sideInput) {
         this(new RulesHbaseRepository(userConfig));
+        this.sideInput = sideInput;
     }
 
     public GetComponentRulesTask(RulesRepository rulesRepository) {
@@ -56,6 +59,7 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
     public void processElement(ProcessContext c) {
         try {
             observations = c.element();
+            System.out.println("Marcel934: " + c.sideInput(sideInput).get("ver"));
             c.output(getActiveObservations());
         } catch (IOException e) {
             LOG.error("Error during searching rules in hbase - ", e);
