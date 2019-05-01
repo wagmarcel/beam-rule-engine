@@ -72,15 +72,16 @@ public final class FullPipelineBuilder {
 
                         .apply(Count.globally())
                         .apply(ParDo.of(new LongToKVFn()))
-                        .apply(MapElements
+                        .apply(ParDo.of(new CountKafkaMessages()))
+                        /*.apply(MapElements
                                 .via(
                                 new SimpleFunction<KV<String, Long>, Map<String, Long>> () {
                                     public Map<String, Long> apply(KV<String, Long> inp) {
                                         Map<String, Long> map = new HashMap<String, Long>();
-                                        map.put("ver", Long.valueOf((int)(Math.random() * 10)));
+                                        map.put("ver", inp.getValue());
                                         return map;
                                     }
-                                }))
+                                }))*/
                         .apply(View.asSingleton());
         //Observation Pipeline
         KafkaSourceObservationsProcessor observationsKafka = new KafkaSourceObservationsProcessor(conf);
