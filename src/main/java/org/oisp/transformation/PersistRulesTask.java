@@ -17,20 +17,21 @@
 
 package org.oisp.transformation;
 
+import org.apache.beam.sdk.state.StateSpec;
+import org.apache.beam.sdk.state.StateSpecs;
+import org.apache.beam.sdk.state.ValueState;
 import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.values.KV;
 import org.oisp.apiclients.DashboardConfigProvider;
 import org.oisp.apiclients.InvalidDashboardResponseException;
 import org.oisp.apiclients.rules.DashboardRulesApi;
 import org.oisp.apiclients.rules.RulesApi;
-import org.oisp.data.RulesRepository;
-import org.oisp.data.rules.RulesHbaseRepository;
 import org.oisp.collection.Rule;
 import org.oisp.conf.Config;
 
 import org.oisp.utils.LogHelper;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -38,39 +39,35 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-public class PersistRulesTask extends DoFn<Map<String, List<Rule>>, byte[]> {
-
-    private RulesRepository rulesRepository;
+public class PersistRulesTask extends DoFn<KV<String, Map<String, List<Rule>>>, Long> {
+    @DoFn.StateId("counter")
+    private final StateSpec<ValueState<Long>> stateSpec = StateSpecs.value();
     private final RulesApi rulesApi;
     private static final Logger LOG = LogHelper.getLogger(PersistRulesTask.class);
 
     public PersistRulesTask(Config userConfig) {
-        this(new RulesHbaseRepository(userConfig), new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
+        this(new DashboardRulesApi(new DashboardConfigProvider(userConfig)));
     }
 
-    public PersistRulesTask(RulesRepository rulesRepository, RulesApi rulesApi) {
-        this.rulesRepository = rulesRepository;
+    public PersistRulesTask(RulesApi rulesApi) {
         this.rulesApi = rulesApi;
-        try {
-            rulesRepository.createTable();
-        } catch (IOException e) {
-            LOG.error("Error while creating HBase Tables " + e);
-        }
     }
-
 
     @ProcessElement
-    public void processElement(ProcessContext c) {
+    public void processElement(ProcessContext c, @DoFn.StateId("counter") ValueState<Long> state) {
         LOG.info("Persisting dashboard rules...");
         try {
-            Map<String, List<Rule>> rules = c.element();
-
-            if (!isRulesEmpty(rules)) {
-                rulesRepository.putRulesAndRemoveNotExistingOnes(rules);
-                rulesApi.markRulesSynchronized(getRulesIds(rules.values()));
+            Map<String, List<Rule>> rules = c.element().getValue();
+            Long counter = state.read();
+            if (counter == null) {
+                counter = 0L;
             }
-        } catch (IOException e) {
-            LOG.error("Persisting error", e);
+            if (!isRulesEmpty(rules)) {
+                rulesApi.markRulesSynchronized(getRulesIds(rules.values()));
+                counter++;
+                state.write(counter);
+                c.output(counter);
+            }
         } catch (InvalidDashboardResponseException e) {
             LOG.error("Unable to mark persisted rules as synchronized in Dashboard", e);
         }
@@ -83,10 +80,7 @@ public class PersistRulesTask extends DoFn<Map<String, List<Rule>>, byte[]> {
                 .collect(Collectors.toSet());
     }
 
-
     private boolean isRulesEmpty(Map<String, List<Rule>> rules) {
         return rules == null || rules.isEmpty();
     }
-
-
 }

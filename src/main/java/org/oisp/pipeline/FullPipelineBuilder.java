@@ -60,28 +60,27 @@ public final class FullPipelineBuilder {
 
 
         //Setup Kafka here becasue it will be used as sideinput and rule update pipeline
+        //Rules-Update
+        //KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
+        DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
+        PersistRulesTask persistRulesTask = new PersistRulesTask(conf);
+        /*p.apply(rulesKafka.getTransform())
+                .apply(ParDo.of(new CombineKVFromByteArrayFn()))*/
         KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
-        PCollection<KV<String, String>> kafkaUpdates = p.apply(rulesKafka.getTransform())
-                .apply(ParDo.of(new CombineKVFromByteArrayFn()));
+        PCollection<Long> persistRuleUpdate = p.apply(rulesKafka.getTransform())
+                .apply(ParDo.of(new CombineKVFromByteArrayFn()))
+                //kafkaUpdates
+                .apply(ParDo.of(downloadRulesTask))
+                .apply(ParDo.of(persistRulesTask));
 
         //Side input
         PCollectionView<Map<String, Long>> kafkaSideInput =
-                kafkaUpdates
-                        .apply(Window.<KV<String, String>>into(new GlobalWindows())
+               persistRuleUpdate
+                        .apply(Window.<Long>into(new GlobalWindows())
                         .triggering(Repeatedly.forever(AfterProcessingTime.pastFirstElementInPane())).discardingFiredPanes())
-
                         .apply(Count.globally())
                         .apply(ParDo.of(new LongToKVFn()))
                         .apply(ParDo.of(new CountKafkaMessages()))
-                        /*.apply(MapElements
-                                .via(
-                                new SimpleFunction<KV<String, Long>, Map<String, Long>> () {
-                                    public Map<String, Long> apply(KV<String, Long> inp) {
-                                        Map<String, Long> map = new HashMap<String, Long>();
-                                        map.put("ver", inp.getValue());
-                                        return map;
-                                    }
-                                }))*/
                         .apply(View.asSingleton());
         //Observation Pipeline
         KafkaSourceObservationsProcessor observationsKafka = new KafkaSourceObservationsProcessor(conf);
@@ -121,15 +120,7 @@ public final class FullPipelineBuilder {
                         .withKeySerializer(StringSerializer.class)
                         .withValueSerializer(StringSerializer.class));
 
-        //Rules-Update
-        //KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
-        DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
-        PersistRulesTask persistRulesTask = new PersistRulesTask(conf);
-        /*p.apply(rulesKafka.getTransform())
-                .apply(ParDo.of(new CombineKVFromByteArrayFn()))*/
-        kafkaUpdates
-                .apply(ParDo.of(downloadRulesTask))
-                .apply(ParDo.of(persistRulesTask));
+
 
         return p;
     }
@@ -156,6 +147,7 @@ public final class FullPipelineBuilder {
     static class CombineKVFromByteArrayFn extends DoFn<KafkaRecord<String, byte[]>, KV<String, String>> {
         @ProcessElement
         public void processElement(ProcessContext c) {
+            System.out.println("Marcel912" + c.element().getKV());
             KafkaRecord<String, byte[]> record = c.element();
             KV<String, String> outputKv = KV.<String, String>of("key", record.getKV().getKey() + " " + new String(record.getKV().getValue()));
             c.output(outputKv);

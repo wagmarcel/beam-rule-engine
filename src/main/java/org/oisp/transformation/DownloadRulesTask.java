@@ -34,7 +34,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 @SuppressWarnings({"checkstyle:illegalcatch", "PMD.AvoidCatchingGenericException"})
-public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, List<Rule>>> {
+public class DownloadRulesTask  extends DoFn<KV<String, String>, KV<String, Map<String, List<Rule>>>> {
 
     private final RulesApi rulesApi;
     private Map<String, List<Rule>> componentsRules;
@@ -52,7 +52,7 @@ public class DownloadRulesTask  extends DoFn<KV<String, String>, Map<String, Lis
     public void processElement(ProcessContext c) {
         try {
             componentsRules = getComponentsRules();
-            c.output(componentsRules);
+            c.output(KV.of("global", componentsRules));
         } catch (InvalidDashboardResponseException e) {
             LOG.error("Unknown error during rules downloading.", e);
         }
