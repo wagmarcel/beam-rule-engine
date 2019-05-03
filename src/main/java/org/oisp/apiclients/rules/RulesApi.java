@@ -26,6 +26,6 @@ import java.util.Set;
 
 public interface RulesApi {
 
-    List<ComponentRulesResponse> getActiveComponentsRules() throws InvalidDashboardResponseException;
+    List<ComponentRulesResponse> getActiveComponentsRules(Boolean synced) throws InvalidDashboardResponseException;
     void markRulesSynchronized(Set<String> rulesIds) throws InvalidDashboardResponseException;
 }

@@ -50,6 +50,8 @@ public class DashboardRulesApi implements RulesApi, Serializable {
     private static final String UPDATE_RULES_PATH = "rules/synchronization_status/Sync";
 
     private static final String RULE_STATUS_NOT_SYNCHRONIZED = "NotSync";
+    private static final String RULE_STATUS_SYNCHRONIZED = "Sync";
+
     private transient RestTemplate template;
 
     public DashboardRulesApi(DashboardConfig dashboardConfig) {
@@ -64,9 +66,9 @@ public class DashboardRulesApi implements RulesApi, Serializable {
     }
 
     @Override
-    public List<ComponentRulesResponse> getActiveComponentsRules() throws InvalidDashboardResponseException {
+    public List<ComponentRulesResponse> getActiveComponentsRules(Boolean synced) throws InvalidDashboardResponseException {
         HttpHeaders headers = ApiClientHelper.getHttpHeaders(getToken());
-        HttpEntity req = new HttpEntity<>(createRuleRequest(), headers);
+        HttpEntity req = new HttpEntity<>(createRuleRequest(synced), headers);
 
         try {
             ParameterizedTypeReference<List<ComponentRulesResponse>> responseType = new ParameterizedTypeReference<List<ComponentRulesResponse>>() {
@@ -99,8 +101,12 @@ public class DashboardRulesApi implements RulesApi, Serializable {
         }
     }
 
-    private RuleRequest createRuleRequest() {
-        return new RuleRequest(RuleStatus.asList(), RULE_STATUS_NOT_SYNCHRONIZED);
+    private RuleRequest createRuleRequest(Boolean synced) {
+        String syncStatus = RULE_STATUS_NOT_SYNCHRONIZED;
+        if (synced) {
+            syncStatus = RULE_STATUS_SYNCHRONIZED;
+        }
+        return new RuleRequest(RuleStatus.asList(), syncStatus);
     }
 
     private String getEndpoint(String restMethod) {

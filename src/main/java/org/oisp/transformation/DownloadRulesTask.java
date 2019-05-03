@@ -59,7 +59,7 @@ public class DownloadRulesTask  extends DoFn<KV<String, String>, KV<String, Map<
     }
 
     private Map<String, List<Rule>> getComponentsRules() throws InvalidDashboardResponseException {
-        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules();
+        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules(false);
         RuleParser ruleParser = new RuleParser(componentsRules);
         Map<String, List<Rule>> result = ruleParser.getComponentRules();
         return result;

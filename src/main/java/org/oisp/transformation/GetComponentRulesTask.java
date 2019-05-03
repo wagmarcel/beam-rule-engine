@@ -121,7 +121,7 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
     }
 
     private Map<String, List<Rule>> getComponentsRules() throws InvalidDashboardResponseException {
-        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules();
+        List<ComponentRulesResponse> componentsRules = rulesApi.getActiveComponentsRules(true);
         RuleParser ruleParser = new RuleParser(componentsRules);
         Map<String, List<Rule>> result = ruleParser.getComponentRules();
         return result;
