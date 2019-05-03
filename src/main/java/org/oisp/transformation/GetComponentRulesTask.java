@@ -67,7 +67,7 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
         try {
             componentsRules = getComponentsRules();
         } catch (InvalidDashboardResponseException e) {
-            LOG.error("Error during searching rules in hbase - ", e);
+            LOG.error("Error during updating rules - ", e);
         }
     }
     /*public GetComponentRulesTask(RulesRepository rulesRepository) {
@@ -84,10 +84,9 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
                 updateComponentRules();
                 componentRuleversion = newComponentRuleVersion;
             }
-            System.out.println("Marcel934: " + c.sideInput(sideInput).get("ver"));
             c.output(getActiveObservations());
         } catch (IOException e) {
-            LOG.error("Error during searching rules in hbase - ", e);
+            LOG.error("Error during searching rules for observations - ", e);
         }
     }
 

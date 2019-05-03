@@ -10,9 +10,7 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Flatten;
-import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.SimpleFunction;
 import org.apache.beam.sdk.transforms.View;
 import org.apache.beam.sdk.transforms.windowing.AfterProcessingTime;
 import org.apache.beam.sdk.transforms.windowing.GlobalWindows;
@@ -22,7 +20,6 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 import org.apache.beam.sdk.values.PCollectionView;
-import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import org.joda.time.Duration;
@@ -46,7 +43,6 @@ import org.oisp.transformation.PersistStatisticsRuleState;
 import org.oisp.transformation.PersistTimeBasedRuleState;
 import org.oisp.transformation.SendAlertFromRule;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,7 +143,6 @@ public final class FullPipelineBuilder {
     static class CombineKVFromByteArrayFn extends DoFn<KafkaRecord<String, byte[]>, KV<String, String>> {
         @ProcessElement
         public void processElement(ProcessContext c) {
-            System.out.println("Marcel912" + c.element().getKV());
             KafkaRecord<String, byte[]> record = c.element();
             KV<String, String> outputKv = KV.<String, String>of("key", record.getKV().getKey() + " " + new String(record.getKV().getValue()));
             c.output(outputKv);
