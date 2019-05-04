@@ -31,27 +31,12 @@ public abstract class RuleEngineBuild {
         //read json config from ENVIRONMENT - needed because stupid mvn cannot read JSON from cmdline. Unbelievable, but true.
         String inputConfig = ((CmdlineOptions) options).getJSONConfig().replaceAll(" ", "\n");
         String config = new String(Base64.getMimeDecoder().decode(inputConfig));
-        /*try {
-            confFromEnv = new String(Files.readAllBytes(Paths.get(((CmdlineOptions) options).getJSONConfig())));
-        } catch (IOException e) {
-            System.out.println("Could not find config data: " + e);
-            System.exit(1);
-        }*/
+
         System.out.println("JSON config retrieved: " + config);
         ExternalConfig extConf = ExternalConfig.getConfigFromString(config);
-        String pipelineName = ((CmdlineOptions) options).getPipelineName();
         Config conf;
-
-        switch (pipelineName) {
-            case "full":
-                conf = extConf.getConfig();
-                fullPipeline = FullPipelineBuilder.build(options, conf);
-                fullPipeline.run().waitUntilFinish();
-                break;
-            default:
-                System.out.println("Error: No PipelineName specified!");
-                PipelineOptionsFactory.printHelp(System.out);
-        }
-
+        conf = extConf.getConfig();
+        fullPipeline = FullPipelineBuilder.build(options, conf);
+        fullPipeline.run().waitUntilFinish();
     }
 }

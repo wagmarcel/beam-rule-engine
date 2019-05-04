@@ -25,13 +25,9 @@ public final class HbaseValues {
 
     public static final String DATA_TABLE_NAME = "_OBSERVATIONS_DATA";
     public static final String DATA_COLUMN_FAMILY = "data_for_statistics_conditions";
-    public static final String DATA_COLUMN_NAME = "val";
 
     public static final String TABLE_NAME = "_RULE_ENGINE";
     public static final String RULE_COMPONENTS_COLUMN_FAMILY = "rule_components";
-    public static final String RULE_COMPONENTS_FULFILLED_COLUMN_NAME = "rule_fulfilled_components";
-
-    public static final String TIMEBASED_RULE_COMPONENTS_COLUMN_NAME = "timebased_rule_components";
 
     public static final String RULES_COLUMN_FAMILY = "rules";
     public static final String RULES_COLUMN_NAME = "rules_active";
