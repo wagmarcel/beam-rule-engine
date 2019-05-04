@@ -5,8 +5,8 @@ import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.Description;
 
 public interface CmdlineOptions extends PipelineOptions {
-    @Description("JSON config for RuleEngine")
-    @Default.String("config.json")
+    @Description("JSON config for RuleEngine in Base64")
+    @Default.String("")
     String getJSONConfig();
     void setJSONConfig(String value);
 

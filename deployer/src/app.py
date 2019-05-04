@@ -17,10 +17,11 @@ import os
 import pprint
 import requests
 import time
+import sys
 
 import oisp
 
-from gearpump_api import GearpumpApi
+from beam_api import BeamApi
 
 def load_config_from_env(varname, seen_keys=None):
     """Read OISP config, which is an extended JSON format
@@ -41,7 +42,7 @@ def load_config_from_env(varname, seen_keys=None):
 
 
 if __name__ == "__main__":
-    print("Starting deployment script")
+    print >> sys.stderr, "Starting deployment script"
     conf = load_config_from_env("OISP_RULEENGINE_CONFIG")
     rule_engine_jar_name = os.environ["RULE_ENGINE_PACKAGE_NAME"]
     uri = "http://{}/v1/api".format(conf["frontendUri"])
@@ -51,11 +52,11 @@ if __name__ == "__main__":
             oisp_client.auth(conf["username"], conf["password"])
             break
         except (requests.exceptions.ConnectionError, oisp.client.OICException):
-            print("Can not connect to {}, retrying".format(uri))
+            print >> sys.stderr, "Can not connect to {}, retrying".format(uri)
             time.sleep(1)
 
     token = oisp_client.user_token.value
-    pprint.pprint(conf)
+    #pprint.pprint(conf)
 
     app_conf = {"application_name": "rule_engine_dashboard",
                 "dashboard_strict_ssl": False,
@@ -74,11 +75,11 @@ y.authentication"],
                 }
 
     # We are only interested in port number because we deploy locally
-    gearpump_port = conf["uri"].split(":")[1]
-    gearpump_api = GearpumpApi(uri="http://localhost:{}".format(gearpump_port),
+    beam_port = conf["uri"].split(":")[1]
+    beam_api = BeamApi(uri="http://localhost:{}".format(beam_port),
                                credentials={"username": conf["gearpumpUsername"],
                                             "password": conf["gearpumpPassword"]})
-    print("Submitting application '{}' into gearpump ...".format(rule_engine_jar_name))
-    gearpump_api.submit_app(filename=rule_engine_jar_name,
+    print >> sys.stderr, "Submitting application '{}' into beam ...".format(rule_engine_jar_name)
+    beam_api.submit_app(filename=rule_engine_jar_name,
                             app_name=app_conf['application_name'],
-                            gearpump_app_config=app_conf, force=True)
+                            beam_app_config=app_conf, force=True)

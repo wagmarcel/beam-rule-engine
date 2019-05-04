@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-echo local-deploy.sh called
+echo local-deploy.sh called >&2
 export RULE_ENGINE_PACKAGE_NAME=rule-engine-bundled-0.1.jar
 #source version.properties &&
 cd deployer &&

@@ -18,12 +18,12 @@ class DashboardApiConfig(object):
     dashboard_call_auth_token = dashboard_api_version + "/api/auth/token"
 
 
-class GearpumpApiConfig(object):
-    version = "v1.0"
-    prefix = "/api/" + version
-    prefix_master = prefix + "/master/"
-    call_login = "/login"
-    call_submit = prefix_master + "submitapp"
-    call_submit_with_args = call_submit + "?args="
-    call_applist = prefix_master + "applist"
-    call_appmaster = prefix + "/appmaster"
+#class GearpumpApiConfig(object):
+#    version = "v1.0"
+#    prefix = "/api/" + version
+#    prefix_master = prefix + "/master/"
+#    call_login = "/login"
+#    call_submit = prefix_master + "submitapp"
+#    call_submit_with_args = call_submit + "?args="
+#    call_applist = prefix_master + "applist"
+#    call_appmaster = prefix + "/appmaster"

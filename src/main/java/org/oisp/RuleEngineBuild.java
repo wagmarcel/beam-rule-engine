@@ -8,9 +8,7 @@ import org.oisp.conf.Config;
 import org.oisp.conf.ExternalConfig;
 import org.oisp.pipeline.FullPipelineBuilder;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Base64;
 
 
 /**
@@ -28,20 +26,19 @@ public abstract class RuleEngineBuild {
                 .as(CmdlineOptions.class);
 
         PipelineOptionsFactory.register(CmdlineOptions.class);
-        //options.setRunner(FlinkRunner.class);
-        //BasicConfigurator.configure();
         Pipeline fullPipeline;
 
-        //read json config from file - needed because stupid mvn cannot read JSON from comdline. Unbelievable, but true.
-        String confFromFile = "";
-        try {
-            confFromFile = new String(Files.readAllBytes(Paths.get(((CmdlineOptions) options).getJSONConfig())));
+        //read json config from ENVIRONMENT - needed because stupid mvn cannot read JSON from cmdline. Unbelievable, but true.
+        String inputConfig = ((CmdlineOptions) options).getJSONConfig().replaceAll(" ", "\n");
+        String config = new String(Base64.getMimeDecoder().decode(inputConfig));
+        /*try {
+            confFromEnv = new String(Files.readAllBytes(Paths.get(((CmdlineOptions) options).getJSONConfig())));
         } catch (IOException e) {
             System.out.println("Could not find config data: " + e);
             System.exit(1);
-        }
-        System.out.println("JSON config retrieved: " + confFromFile);
-        ExternalConfig extConf = ExternalConfig.getConfigFromString(confFromFile);
+        }*/
+        System.out.println("JSON config retrieved: " + config);
+        ExternalConfig extConf = ExternalConfig.getConfigFromString(config);
         String pipelineName = ((CmdlineOptions) options).getPipelineName();
         Config conf;
 

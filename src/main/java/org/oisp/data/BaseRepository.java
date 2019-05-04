@@ -17,7 +17,6 @@
 
 package org.oisp.data;
 
-import org.oisp.data.statistics.CustomAggregationClient;
 import org.oisp.conf.Config;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -98,7 +97,4 @@ public abstract class BaseRepository implements Serializable {
         return getHbaseConnection().getAdmin();
     }
 
-    protected CustomAggregationClient getAggregationClient() throws IOException {
-        return new CustomAggregationClient(getHbaseConnection());
-    }
 }
