@@ -41,7 +41,16 @@ public class ExternalConfig {
     private String krb_realm;
     private String krb_master_principal;
     private String krb_regionserver_principal;
+    private String backendType;
 
+
+    public String getBackendType() {
+        return backendType;
+    }
+
+    public void setBackendType(String backendType) {
+        this.backendType = backendType;
+    }
 
     public String getKafka_observations_topic() {
         return kafka_observations_topic;

@@ -90,6 +90,10 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
         }
     }
 
+    @Teardown
+    public void teardown() {
+        System.out.println("Teardown of Transform.");
+    }
     private List<RulesWithObservation> getActiveObservations() throws IOException {
         List<RulesWithObservation> rulesWithObservations = getRulesWithObservation(observations);
 
