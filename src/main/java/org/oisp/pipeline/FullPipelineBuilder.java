@@ -7,9 +7,9 @@ import org.apache.beam.sdk.io.GenerateSequence;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.kafka.KafkaRecord;
 import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.Max;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.View;
 import org.apache.beam.sdk.transforms.windowing.AfterProcessingTime;
@@ -43,6 +43,7 @@ import org.oisp.transformation.PersistStatisticsRuleState;
 import org.oisp.transformation.PersistTimeBasedRuleState;
 import org.oisp.transformation.SendAlertFromRule;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,30 +56,30 @@ public final class FullPipelineBuilder {
         Pipeline p = Pipeline.create(options);
 
 
-        //Setup Kafka here becasue it will be used as sideinput and rule update pipeline
-        //Rules-Update
-        //KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
+        //Rules-Update Pipeline
+        //Detects changes of Ruleset
+        //Updates local rule storage
+        //Signals rule updates to Observation Pipeline
         DownloadRulesTask downloadRulesTask = new DownloadRulesTask(conf);
         PersistRulesTask persistRulesTask = new PersistRulesTask(conf);
-        /*p.apply(rulesKafka.getTransform())
-                .apply(ParDo.of(new CombineKVFromByteArrayFn()))*/
         KafkaSourceProcessor rulesKafka = new KafkaSourceRulesUpdateProcessor(conf);
         PCollection<Long> persistRuleUpdate = p.apply(rulesKafka.getTransform())
                 .apply(ParDo.of(new CombineKVFromByteArrayFn()))
-                //kafkaUpdates
                 .apply(ParDo.of(downloadRulesTask))
                 .apply(ParDo.of(persistRulesTask));
 
-        //Side input
+        //Side input to signal change of ruleset
         PCollectionView<Map<String, Long>> kafkaSideInput =
                persistRuleUpdate
                         .apply(Window.<Long>into(new GlobalWindows())
                         .triggering(Repeatedly.forever(AfterProcessingTime.pastFirstElementInPane())).discardingFiredPanes())
-                        .apply(Count.globally())
-                        .apply(ParDo.of(new LongToKVFn()))
-                        .apply(ParDo.of(new CountKafkaMessages()))
+                        .apply(Max.longsGlobally())
+                        .apply(ParDo.of(new LongToMapFn()))
                         .apply(View.asSingleton());
+
         //Observation Pipeline
+        //Map observations to rules
+        //Process rules for Basic, Timebased and Statistics
         KafkaSourceObservationsProcessor observationsKafka = new KafkaSourceObservationsProcessor(conf);
         PCollection<List<RulesWithObservation>> rwo = p.apply(observationsKafka.getTransform())
                 .apply(ParDo.of(new KafkaToObservationFn()))
@@ -104,10 +105,10 @@ public final class FullPipelineBuilder {
                 .apply(ParDo.of(new CheckRuleFulfillment()))
                 .apply(ParDo.of(new SendAlertFromRule(conf)));
 
-        //Heartbeat
+        //Heartbeat Pipeline
+        //Send regular Heartbeat to Kafka topic
         String serverUri = conf.get(Config.KAFKA_URI_PROPERTY).toString();
         System.out.println("serverUri:" + serverUri);
-        //Pipeline p = Pipeline.create(options);
         p.apply(GenerateSequence.from(0).withRate(1, Duration.standardSeconds(1)))
                 .apply(ParDo.of(new StringToKVFn()))
                 .apply(KafkaIO.<String, String>write()
@@ -148,10 +149,13 @@ public final class FullPipelineBuilder {
             c.output(outputKv);
         }
     }
-    static class LongToKVFn extends DoFn<Long, KV<String, Long>> {
+    static class LongToMapFn extends DoFn<Long, Map<String, Long>> {
         @ProcessElement
         public void processElement(ProcessContext c) {
-            c.output(KV.of("ver", 1L));
+            Map<String, Long> map = new HashMap<String, Long>();
+            map.put("ver", c.element());
+            System.out.println("Marcel423: " + c.element());
+            c.output(map);
         }
     }
 }

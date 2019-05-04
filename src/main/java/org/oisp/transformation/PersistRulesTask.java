@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class PersistRulesTask extends DoFn<KV<String, Map<String, List<Rule>>>, Long> {
     @DoFn.StateId("counter")
     private final StateSpec<ValueState<Long>> stateSpec = StateSpecs.value();
@@ -66,6 +66,7 @@ public class PersistRulesTask extends DoFn<KV<String, Map<String, List<Rule>>>, 
                 rulesApi.markRulesSynchronized(getRulesIds(rules.values()));
                 counter++;
                 state.write(counter);
+                System.out.println("Marcel245:" + counter);
                 c.output(counter);
             }
         } catch (InvalidDashboardResponseException e) {

@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -80,6 +79,7 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
             observations = c.element();
             //check componentRuleversion/sequence number to trigger rules update if needed
             Long newComponentRuleVersion = c.sideInput(sideInput).get("ver");
+            System.out.println("Marcel293: " + newComponentRuleVersion + " " + componentRuleversion);
             if (newComponentRuleVersion != componentRuleversion) {
                 updateComponentRules();
                 componentRuleversion = newComponentRuleVersion;
@@ -101,15 +101,6 @@ public class GetComponentRulesTask extends DoFn<List<Observation>, List<RulesWit
     }
 
     private List<RulesWithObservation> getRulesWithObservation(List<Observation> observations) throws IOException {
-        Set<String> componentsIds = observations.stream()
-                .map(o -> o.getCid())
-                .collect(Collectors.toSet());
-
-        String accountId = observations.stream()
-                .findFirst().get().getAid();
-
-        //Map<String, List<Rule>> componentsRules = rulesRepository.getComponentsRules(accountId, componentsIds);
-
         return observations.stream()
                 .map(observation -> new RulesWithObservation(observation, componentsRules.get(observation.getCid())))
                 .collect(Collectors.toList());
